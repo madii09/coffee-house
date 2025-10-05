@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coffee House</title>
+    <link rel="icon" href="favicon.ico" />
+    <link rel="stylesheet" href="scss/main.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="container header__container">
+        <a href="index.html" class="logo">CoffeeHouse</a>
+        <nav class="nav">
+          <ul class="nav__list">
+            <li><a href="#enjoy">Enjoy</a></li>
+            <li><a href="#favourites">Favourites</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#mobile-app">App</a></li>
+            <li><a href="#contacts">Contacts</a></li>
+          </ul>
+        </nav>
+        <button class="menu-btn" id="burger-btn" aria-label="Open menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </header>
+
+    <main>
+      <section id="enjoy" class="enjoy">
+        <video
+          autoplay
+          muted
+          loop
+          playsinline
+          class="enjoy__video"
+          poster="assets/images/coffee-1.jpg"
+        >
+          <source src="assets/images/hero-video.mp4" type="video/mp4" />
+        </video>
+        <div class="enjoy__content">
+          <h1>Enjoy your coffee</h1>
+          <button class="btn" data-menu-link>Menu</button>
+        </div>
+      </section>
+
+      <section id="favourites" class="favourites">
+        <h2>Our Favourites</h2>
+        <div class="carousel">
+          <button class="carousel__arrow carousel__arrow--left">&#8592;</button>
+          <div class="carousel__track"></div>
+          <button class="carousel__arrow carousel__arrow--right">
+            &#8594;
+          </button>
+          <div class="carousel__progress"></div>
+        </div>
+      </section>
+
+      <section id="about" class="about">
+        <h2>About Us</h2>
+        <p>We love coffee and bring you the best blends worldwide.</p>
+        <div class="about__images">
+          <img src="assets/images/coffee-1.jpg" alt="Coffee beans" />
+          <img src="assets/images/coffee-1.jpg" alt="Coffee cup" />
+        </div>
+      </section>
+
+      <section id="mobile-app" class="mobile-app">
+        <h2>Mobile App</h2>
+        <p>Order your favourite drinks anytime, anywhere.</p>
+      </section>
+    </main>
+
+    <footer id="contacts" class="footer">
+      <div class="footer__container">
+        <a href="tel:+123456789" class="footer__link">
+          <img src="assets/icons/phone.svg" alt="" /> +1 (234) 567-89
+        </a>
+        <a href="https://maps.google.com" target="_blank" class="footer__link">
+          <img src="assets/icons/map.svg" alt="" /> Find us on Google Maps
+        </a>
+      </div>
+    </footer>
+
+    <script src="js/main.js" defer></script>
+  </body>
+</html>
