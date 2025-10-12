@@ -81,11 +81,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     additiveOptions.innerHTML = item.additives
       .map(
-        (add) => `
-          <button data-additive="${add.name}" data-price="${add['add-price']}">
-            ${add.name} (+$${add['add-price']})
-          </button>
-        `
+        (add, index) => `
+      <button 
+        data-additive="${add.name}" 
+        data-price="${add['add-price']}"
+      >
+        <span class="number">${index + 1}</span> ${add.name}
+      </button>
+    `
       )
       .join('');
 
