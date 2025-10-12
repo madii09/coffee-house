@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Menu – Coffee House</title>
-    <link rel="icon" href="favicon.ico" />
+    <link rel="icon" href="./favicon.ico" />
     <link rel="stylesheet" href="scss/main.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,6 +26,7 @@
             <li><a href="index.html#about">About</a></li>
             <li><a href="index.html#mobile-app">Mobile app</a></li>
             <li><a href="index.html#contacts">Contact us</a></li>
+            <li class="menu-link-mobile"><a href="menu.html">Menu</a></li>
           </ul>
         </nav>
 
@@ -33,6 +34,10 @@
           <span>Menu</span>
           <img src="./assets/icons/coffee-cup.png" alt="Coffee Cup" />
         </a>
+        <button class="menu-btn" id="burger-btn" aria-label="Open menu">
+          <span></span>
+          <span></span>
+        </button>
       </div>
     </header>
 
@@ -47,10 +52,15 @@
         <section class="menu-section">
           <div class="menu-nav">
             <button class="menu-btn active" data-category="coffee">
+              <img src="./assets/icons/coffee.png" alt="coffee" />
               Coffee
             </button>
-            <button class="menu-btn" data-category="tea">Tea</button>
-            <button class="menu-btn" data-category="dessert">Desserts</button>
+            <button class="menu-btn" data-category="tea">
+              <img src="./assets/icons/tea.png" alt="tea" />Tea
+            </button>
+            <button class="menu-btn" data-category="dessert">
+              <img src="./assets/icons/dessert.png" alt="dessert" />Desserts
+            </button>
           </div>
 
           <div id="menu-items" class="menu-items"></div>
@@ -120,12 +130,11 @@
     </footer>
     <div class="modal" id="item-modal">
       <div class="modal-content">
-        <span class="close-btn">&times;</span>
         <div class="modal-body">
-          <img id="modal-img" src="" alt="" />
+          <img id="modal-img" src="" alt="modal" />
           <div class="modal-info">
             <h2 id="modal-name"></h2>
-            <p id="modal-desc"></p>
+            <p id="modal-desc" class="description"></p>
 
             <div class="modal-section">
               <h4>Size</h4>
@@ -138,20 +147,23 @@
             </div>
 
             <div class="price-section">
-              <span>Total: $<span id="modal-price"></span></span>
+              <span>Total: </span><span>$<span id="modal-price"></span></span>
             </div>
             <hr />
-            <p>
-              The cost is not final. Download our mobile app to see the final
-              price and place your order. Earn loyalty points and enjoy your
-              favorite coffee with up to 20% discount.
-            </p>
-            <button>Close</button>
+            <div class="discount">
+              <p>
+                The cost is not final. Download our mobile app to see the final
+                price and place your order. Earn loyalty points and enjoy your
+                favorite coffee with up to 20% discount.
+              </p>
+            </div>
+
+            <button class="close-btn">Close</button>
           </div>
         </div>
       </div>
     </div>
-
+    <script src="js/main.js" defer></script>
     <script src="js/menu.js" defer></script>
   </body>
 </html>

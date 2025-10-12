@@ -1,3 +1,23 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+video {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 body {
   font-family: $font-main;
   color: $text-color-dark;
@@ -28,6 +48,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+  .menu-link-mobile {
+    display: none;
   }
 
   .logo {
@@ -74,19 +97,34 @@ body {
       padding-bottom: 5px;
     }
   }
+  .nav {
+    display: flex;
+    gap: 2rem;
+  }
 
-  /* Burger button for mobile */
   .menu-btn {
     display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
 
-    span {
-      display: block;
-      width: 25px;
-      height: 3px;
-      margin: 4px 0;
-      background-color: #333;
-      transition: all 0.3s ease;
-    }
+  .menu-btn span {
+    width: 25px;
+    height: 3px;
+    background-color: #333;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+  }
+
+  .menu-btn.active span:nth-child(1) {
+    transform: rotate(45deg) translateY(8px);
+  }
+
+  .menu-btn.active span:nth-child(2) {
+    transform: rotate(-45deg) translateY(-8px);
   }
 }
 
@@ -99,7 +137,6 @@ body {
     height: 644px;
     border-radius: 40px;
     overflow: hidden;
-    padding: 0 40px;
   }
 
   &__video {
@@ -158,10 +195,10 @@ body {
       &::after {
         content: '';
         position: absolute;
-        right: 30px;
+        right: 40px;
         top: 50%;
-        height: 22px;
-        width: 22px;
+        height: 20px;
+        width: 20px;
         background-image: url('../assets/icons/coffee-cup.png');
         background-size: contain;
         background-repeat: no-repeat;
@@ -343,19 +380,6 @@ body {
       width: 660px;
       height: 590px;
     }
-
-    @media (max-width: 768px) {
-      flex-direction: column;
-
-      .about__column {
-        align-items: center;
-      }
-
-      img {
-        width: 100%;
-        height: auto;
-      }
-    }
   }
 }
 .mobile-app {
@@ -534,32 +558,5 @@ body {
         }
       }
     }
-  }
-}
-
-@media (max-width: 768px) {
-  .enjoy {
-    height: 400px;
-
-    &__content {
-      h1 {
-        font-size: 2rem;
-      }
-
-      .btn {
-        font-size: 1rem;
-      }
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .nav__list,
-  .header__menu {
-    display: none;
-  }
-
-  .menu-btn {
-    display: block;
   }
 }
