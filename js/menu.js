@@ -11,6 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const additiveOptions = document.getElementById('additive-options');
   const closeBtn = document.querySelector('.close-btn');
 
+  const loadMoreBtn = document.getElementById('loadMoreBtn');
+
+  const ITEMS_TO_SHOW = 4;
+  let currentCategory = 'coffee';
+  let displayedCount = ITEMS_TO_SHOW;
+  let menuDataGlobal = [];
+
   let currentItem = null;
   let basePrice = 0;
   let selectedAdditives = [];
@@ -18,13 +25,14 @@ document.addEventListener('DOMContentLoaded', () => {
   fetch('./data/products.json')
     .then((res) => res.json())
     .then((data) => {
-      renderItems(data, 'coffee');
+      menuDataGlobal = data;
+      renderItems(data, currentCategory);
 
       buttons.forEach((btn) => {
         btn.addEventListener('click', () => {
           buttons.forEach((b) => b.classList.remove('active'));
           btn.classList.add('active');
-          renderItems(data, btn.dataset.category);
+          renderItems(menuDataGlobal, btn.dataset.category);
         });
       });
 
@@ -33,31 +41,59 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!card) return;
 
         const itemName = card.querySelector('h3').textContent;
-        const itemData = data.find((i) => i.name === itemName);
+        const itemData = menuDataGlobal.find((i) => i.name === itemName);
 
         if (itemData) openModal(itemData);
       });
-
-      function renderItems(menuData, category) {
-        const filtered = menuData.filter((item) => item.category === category);
-
-        menuItemsContainer.innerHTML = filtered
-          .map(
-            (item) => `
-            <div class="menu-card">
-              <img src="./assets/images/${item.image}" alt="${item.name}" />
-              <div class="menu-info">
-                <h3>${item.name}</h3>
-                <p>${item.description}</p>
-                <span class="price">$${item.price}</span>
-              </div>
-            </div>
-          `
-          )
-          .join('');
-      }
     })
     .catch((err) => console.error('Error loading menu:', err));
+
+  function renderItems(menuData, category) {
+    currentCategory = category;
+    displayedCount = ITEMS_TO_SHOW;
+
+    const filtered = menuData.filter((item) => item.category === category);
+
+    menuItemsContainer.innerHTML = filtered
+      .map(
+        (item, index) => `
+      <div class="menu-card" style="${
+        window.innerWidth <= 768 && index >= ITEMS_TO_SHOW
+          ? 'display:none;'
+          : ''
+      }">
+        <img src="./assets/images/${item.image}" alt="${item.name}" />
+        <div class="menu-info">
+          <h3>${item.name}</h3>
+          <p>${item.description}</p>
+          <span class="price">$${item.price}</span>
+        </div>
+      </div>
+    `
+      )
+      .join('');
+
+    if (window.innerWidth <= 768 && filtered.length > ITEMS_TO_SHOW) {
+      loadMoreBtn.style.display = 'block';
+    } else {
+      loadMoreBtn.style.display = 'none';
+    }
+  }
+
+  loadMoreBtn.addEventListener('click', () => {
+    const cards = menuItemsContainer.querySelectorAll('.menu-card');
+    cards.forEach((card, index) => {
+      if (index < displayedCount + ITEMS_TO_SHOW) {
+        card.style.display = 'block';
+      }
+    });
+
+    displayedCount += ITEMS_TO_SHOW;
+
+    if (displayedCount >= cards.length) {
+      loadMoreBtn.style.display = 'none';
+    }
+  });
 
   function openModal(item) {
     currentItem = item;
@@ -72,23 +108,23 @@ document.addEventListener('DOMContentLoaded', () => {
     sizeOptions.innerHTML = Object.entries(item.sizes)
       .map(
         ([key, val]) => `
-          <button data-size="${key}" data-add="${val['add-price']}" class="${
+        <button data-size="${key}" data-add="${val['add-price']}" class="${
           key === 's' ? 'active' : ''
         }">${key.toUpperCase()} (${val.size})</button>
-        `
+      `
       )
       .join('');
 
     additiveOptions.innerHTML = item.additives
       .map(
         (add, index) => `
-      <button 
-        data-additive="${add.name}" 
-        data-price="${add['add-price']}"
-      >
-        <span class="number">${index + 1}</span> ${add.name}
-      </button>
-    `
+        <button 
+          data-additive="${add.name}" 
+          data-price="${add['add-price']}"
+        >
+          <span class="number">${index + 1}</span> ${add.name}
+        </button>
+      `
       )
       .join('');
 
@@ -132,5 +168,9 @@ document.addEventListener('DOMContentLoaded', () => {
   closeBtn.addEventListener('click', () => modal.classList.remove('active'));
   window.addEventListener('click', (e) => {
     if (e.target === modal) modal.classList.remove('active');
+  });
+
+  window.addEventListener('resize', () => {
+    renderItems(menuDataGlobal, currentCategory);
   });
 });
