@@ -84,19 +84,33 @@ body {
   .header__menu {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    gap: 5px;
+    padding-bottom: 3px;
     font-weight: 500;
     color: $text-color-dark;
-    border-bottom: 2px solid $border-dark;
-    text-decoration: none;
     cursor: pointer;
+    text-decoration: none;
+
+    border-bottom: none;
+    position: relative;
+
+    span {
+      text-align: center;
+      border-bottom: 2px solid transparent;
+      transition: border-color 0.3s ease;
+    }
+
+    &:hover {
+      border-bottom: 2px solid $border-dark;
+    }
 
     img {
       height: 22px;
       width: auto;
-      padding-bottom: 5px;
     }
   }
+
   .nav {
     display: flex;
     gap: 2rem;
@@ -134,8 +148,9 @@ body {
 
   .container {
     position: relative;
+    width: 100%;
     height: 644px;
-    border-radius: 40px;
+
     overflow: hidden;
   }
 
@@ -147,7 +162,7 @@ body {
     width: calc(100% - 80px);
     height: 100%;
     object-fit: cover;
-    border-radius: 20px;
+    border-radius: 40px;
     z-index: 0;
   }
 
@@ -386,6 +401,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 2rem;
   margin-top: 100px;
 
@@ -442,13 +458,6 @@ body {
           display: flex;
           flex-direction: column;
           line-height: 1.1;
-
-          p {
-            margin: 0;
-            font-size: 12px;
-            font-weight: 400;
-            color: darken($text-color-dark, 10%);
-          }
 
           span {
             font-size: 16px;
