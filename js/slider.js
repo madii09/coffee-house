@@ -55,6 +55,12 @@ async function initSlider() {
       });
 
     updateSlide();
+
+    const intervalSeconds = 5;
+    setInterval(() => {
+      current = (current + 1) % sliderItems.length;
+      updateSlide();
+    }, intervalSeconds * 1000);
   } catch (err) {
     console.error('Error loading slider:', err);
   }
