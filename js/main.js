@@ -28,10 +28,45 @@ if (track && nextButton && prevButton) {
 const burgerBtn = document.getElementById('burger-btn');
 const nav = document.querySelector('.nav');
 
+let savedScrollY = 0;
+
+function lockBodyScroll() {
+  savedScrollY =
+    window.scrollY ||
+    window.pageYOffset ||
+    document.documentElement.scrollTop ||
+    0;
+  document.body.style.top = `-${savedScrollY}px`;
+  document.body.classList.add('body-scroll-lock');
+}
+
+function unlockBodyScroll() {
+  document.body.classList.remove('body-scroll-lock');
+  document.body.style.top = '';
+
+  window.scrollTo(0, savedScrollY);
+}
+
 if (burgerBtn && nav) {
   burgerBtn.addEventListener('click', () => {
-    nav.classList.toggle('open');
+    const isOpen = nav.classList.toggle('open');
     burgerBtn.classList.toggle('active');
+
+    if (isOpen) {
+      lockBodyScroll();
+    } else {
+      unlockBodyScroll();
+    }
+  });
+
+  document.querySelectorAll('.nav__list a').forEach((link) => {
+    link.addEventListener('click', () => {
+      if (nav.classList.contains('open')) {
+        nav.classList.remove('open');
+        burgerBtn.classList.remove('active');
+        unlockBodyScroll();
+      }
+    });
   });
 }
 

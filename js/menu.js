@@ -105,31 +105,49 @@ document.addEventListener('DOMContentLoaded', () => {
     modalDesc.textContent = item.description;
     modal.classList.add('active');
 
+    // ✅ Prevent scrolling and hide burger menu
+    document.body.classList.add('modal-open');
+    document.body.style.overflow = 'hidden';
+
     sizeOptions.innerHTML = Object.entries(item.sizes)
       .map(
         ([key, val]) => `
-        <button data-size="${key}" data-add="${val['add-price']}" class="${
+      <button data-size="${key}" data-add="${val['add-price']}" class="${
           key === 's' ? 'active' : ''
         }">${key.toUpperCase()} (${val.size})</button>
-      `
+    `
       )
       .join('');
 
     additiveOptions.innerHTML = item.additives
       .map(
         (add, index) => `
-        <button 
-          data-additive="${add.name}" 
-          data-price="${add['add-price']}"
-        >
-          <span class="number">${index + 1}</span> ${add.name}
-        </button>
-      `
+      <button 
+        data-additive="${add.name}" 
+        data-price="${add['add-price']}"
+      >
+        <span class="number">${index + 1}</span> ${add.name}
+      </button>
+    `
       )
       .join('');
 
     updatePrice();
   }
+
+  closeBtn.addEventListener('click', () => {
+    modal.classList.remove('active');
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = ''; // ✅ restore scroll
+  });
+
+  window.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.remove('active');
+      document.body.classList.remove('modal-open');
+      document.body.style.overflow = ''; // ✅ restore scroll
+    }
+  });
 
   function updatePrice() {
     const sizeButton = sizeOptions.querySelector('.active');
