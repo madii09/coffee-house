@@ -35,7 +35,6 @@
     &__content {
       width: 85%;
       max-width: 450px;
-      text-align: center;
 
       h1 {
         font-size: 32px;
@@ -308,7 +307,6 @@
       transform: translate(-50%, -50%);
       width: 90%;
       max-width: 400px;
-      text-align: center;
 
       h1 {
         font-size: 28px;
@@ -394,24 +392,21 @@
   }
 
   .mobile-app {
-    flex-direction: column-reverse;
-    text-align: center;
-    gap: 40px;
+    text-align: start;
+    gap: 20px;
 
     .text-mobile {
       width: 100%;
 
       h2 {
-        font-size: 38px;
+        font-size: 48px;
       }
 
       p {
-        font-size: 15px;
+        font-size: 22px;
       }
 
       .btn-mobile {
-        justify-content: center;
-
         button {
           width: 180px;
           height: 58px;
@@ -496,7 +491,6 @@
       h1 {
         font-size: 38px;
         line-height: 1.3;
-        text-align: center;
       }
 
       p {
@@ -543,7 +537,6 @@
     h2 {
       font-size: 24px;
       margin-bottom: 1rem;
-      text-align: center;
     }
 
     &__images {
@@ -579,6 +572,7 @@
       }
 
       .btn-mobile {
+        flex-direction: column;
         button {
           width: 150px;
           height: 50px;
