@@ -1,4 +1,4 @@
-import { CoffeeItem } from '../types/product';
+import { CoffeeItem } from '../../src/types/product';
 
 const BASE_URL = 'https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com/api';
 

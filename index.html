@@ -12,6 +12,10 @@
       href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Jost:ital@0;1&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+    />
   </head>
   <body>
     <header class="header">
@@ -29,11 +33,25 @@
             <li class="menu-link-mobile"><a href="menu.html">Menu</a></li>
           </ul>
         </nav>
+        <div class="cart-menu">
+          <a
+            href="cart.html"
+            class="header__cart"
+            id="cart-icon"
+            aria-label="Cart"
+          >
+            <img src="./assets/icons/cart.svg" alt="Cart" />
+            <span class="cart-count">0</span>
+          </a>
 
-        <a href="menu.html" class="header__menu active">
-          <span>Menu</span>
-          <img src="./assets/icons/coffee-cup.png" alt="Coffee Cup" />
-        </a>
+          <a href="menu.html" class="header__menu active">
+            <span>Menu</span>
+            <img src="./assets/icons/coffee-cup.png" alt="Coffee Cup" />
+          </a>
+          <button id="logout-btn" class="header__logout" aria-label="Logout">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
 
         <button class="menu-btn" id="burger-btn" aria-label="Open menu">
           <span></span>
@@ -236,7 +254,7 @@
       </div>
     </footer>
 
-    <script src="js/main.js" defer></script>
-    <script src="js/slider.js"></script>
+    <script type="module" src="main.ts" defer></script>
+    <script type="module" src="./src/ts/slider.ts"></script>
   </body>
 </html>

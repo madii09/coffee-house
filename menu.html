@@ -30,10 +30,22 @@
           </ul>
         </nav>
 
-        <a href="menu.html" class="header__menu active">
-          <span>Menu</span>
-          <img src="./assets/icons/coffee-cup.png" alt="Coffee Cup" />
-        </a>
+        <div class="cart-menu">
+          <a
+            href="cart.html"
+            class="header__cart"
+            id="cart-icon"
+            aria-label="Cart"
+          >
+            <img src="./assets/icons/cart.svg" alt="Cart" />
+            <span class="cart-count">0</span>
+          </a>
+
+          <a href="menu.html" class="header__menu active">
+            <span>Menu</span>
+            <img src="./assets/icons/coffee-cup.png" alt="Coffee Cup" />
+          </a>
+        </div>
         <button class="menu-btn" id="burger-btn" aria-label="Open menu">
           <span></span>
           <span></span>
@@ -161,13 +173,11 @@
                 favorite coffee with up to 20% discount.
               </p>
             </div>
-
-            <button class="close-btn">Close</button>
           </div>
         </div>
       </div>
     </div>
-    <script src="js/main.js" defer></script>
-    <script src="js/menu.js" defer></script>
+    <script src="main.ts" defer></script>
+    <script type="module" src="./src/ts/menu.ts"></script>
   </body>
 </html>
