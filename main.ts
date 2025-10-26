@@ -1,3 +1,4 @@
+import { updateCartCountUI } from './src/ts/cart-utils'
 const track = document.querySelector<HTMLElement>('.carousel__track');
 const nextButton = document.querySelector<HTMLButtonElement>('.carousel__arrow--right');
 const prevButton = document.querySelector<HTMLButtonElement>('.carousel__arrow--left');
@@ -8,7 +9,7 @@ if (track && nextButton && prevButton) {
   let currentIndex = 0;
 
   function updateCarousel(): void {
-    if (!track) return; // Extra safety (TypeScript happy)
+    if (!track) return;
     track.style.transform = `translateX(-${currentIndex * 100}%)`;
     progressLines.forEach((line, index) => {
       line.classList.toggle('active', index === currentIndex);
@@ -27,7 +28,6 @@ if (track && nextButton && prevButton) {
 }
 
 
-// Burger Menu
 const burgerBtn = document.getElementById('burger-btn') as HTMLButtonElement | null;
 const nav = document.querySelector<HTMLElement>('.nav');
 
@@ -73,10 +73,37 @@ if (burgerBtn && nav) {
   });
 }
 
-// Menu link redirect
 const menuLink = document.querySelector<HTMLElement>('[data-menu-link]');
 if (menuLink) {
   menuLink.addEventListener('click', (): void => {
     window.location.href = 'menu.html';
   });
 }
+const logoutBtn = document.getElementById('logout-btn');
+
+const isLoggedIn = !!localStorage.getItem('access_token');
+
+if (logoutBtn) {
+  if (isLoggedIn) {
+    logoutBtn.style.display = 'block';
+  } else {
+    logoutBtn.style.display = 'none';
+  }
+
+  logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('user');
+    sessionStorage.clear();
+    alert('Logged out successfully!');
+    logoutBtn.style.display = 'none';
+    window.location.href = 'signin.html';
+  });
+}
+document.addEventListener('DOMContentLoaded', () => {
+  updateCartCountUI();
+});
+window.addEventListener('storage', (event) => {
+  if (event.key === 'coffee_cart_v1') {
+    updateCartCountUI();
+  }
+});
