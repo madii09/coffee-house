@@ -1,9 +1,19 @@
 import { defineConfig } from 'vite';
+import path from 'path';
 
 export default defineConfig({
   root: './',
   build: {
     outDir: 'dist',
+    rollupOptions: {
+      input: {
+        main: path.resolve(__dirname, 'index.html'),
+        menu: path.resolve(__dirname, 'menu.html'),
+        register: path.resolve(__dirname, 'register.html'),
+        signin: path.resolve(__dirname, 'signin.html'),
+        cart: path.resolve(__dirname, 'cart.html'),
+      },
+    },
   },
   server: {
     port: 5173,
@@ -12,7 +22,7 @@ export default defineConfig({
   css: {
     preprocessorOptions: {
       scss: {
-        additionalData: `@import "/src/scss/_variables.scss";`
+        additionalData: `@use "/src/scss/_variables.scss" as *;`
       }
     }
   },
