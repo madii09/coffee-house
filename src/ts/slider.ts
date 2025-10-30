@@ -1,11 +1,11 @@
-import { Product } from '../types/types';
+import { Product } from "../types/types";
 
-const API_BASE = 'https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com';
+const API_BASE = "https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com";
 
 type ImageMapItem = { name: string; image: string };
 
 async function loadImageMap(): Promise<Record<string, string>> {
-  const res = await fetch('/data/images.json');
+  const res = await fetch("/data/images.json");
   const data: ImageMapItem[] = await res.json();
 
   const map: Record<string, string> = {};
@@ -17,7 +17,7 @@ async function loadImageMap(): Promise<Record<string, string>> {
 }
 
 async function initSlider(): Promise<void> {
-  const carousel = document.querySelector<HTMLDivElement>('.carousel');
+  const carousel = document.querySelector<HTMLDivElement>(".carousel");
 
   const showErrorMessage = (message: string) => {
     if (!carousel) return;
@@ -45,37 +45,37 @@ async function initSlider(): Promise<void> {
 
     const sliderItems = allData.filter(item => imageMap[item.name]).slice(0, 3);
 
-    const track = document.querySelector<HTMLDivElement>('.carousel__track');
-    const progress = document.querySelector<HTMLDivElement>('.carousel__progress');
-    const textName = document.querySelector<HTMLSpanElement>('.text .name');
-    const textDesc = document.querySelector<HTMLParagraphElement>('.text .desc');
-    const textPrice = document.querySelector<HTMLDivElement>('.text .price');
+    const track = document.querySelector<HTMLDivElement>(".carousel__track");
+    const progress = document.querySelector<HTMLDivElement>(".carousel__progress");
+    const textName = document.querySelector<HTMLSpanElement>(".text .name");
+    const textDesc = document.querySelector<HTMLParagraphElement>(".text .desc");
+    const textPrice = document.querySelector<HTMLDivElement>(".text .price");
 
     if (!track || !progress || !textName || !textDesc || !textPrice || !carousel) {
       showErrorMessage("Something went wrong. Please, refresh the page");
       return;
     }
 
-    track.innerHTML = '';
-    progress.innerHTML = '';
+    track.innerHTML = "";
+    progress.innerHTML = "";
 
     sliderItems.forEach((item, index) => {
-      const slide = document.createElement('div');
-      slide.classList.add('carousel__slide');
+      const slide = document.createElement("div");
+      slide.classList.add("carousel__slide");
       const imgSrc = imageMap[item.name];
       slide.innerHTML = `<img src="${imgSrc}" alt="${item.name}" loading="lazy" />`;
       track.appendChild(slide);
 
-      const line = document.createElement('div');
-      line.classList.add('carousel__progress-line');
-      if (index === 0) line.classList.add('active');
+      const line = document.createElement("div");
+      line.classList.add("carousel__progress-line");
+      if (index === 0) line.classList.add("active");
       progress.appendChild(line);
     });
 
     let current = 0;
 
     function isUserLoggedIn(): boolean {
-      return Boolean(localStorage.getItem('access_token'));
+      return Boolean(localStorage.getItem("access_token"));
     }
 
     const updateSlide = () => {
@@ -94,21 +94,21 @@ async function initSlider(): Promise<void> {
         textPrice.textContent = `$${Number(price).toFixed(2)}`;
       }
 
-      document.querySelectorAll<HTMLDivElement>('.carousel__progress-line')
-        .forEach((line, i) => line.classList.toggle('active', i === current));
+      document.querySelectorAll<HTMLDivElement>(".carousel__progress-line")
+        .forEach((line, i) => line.classList.toggle("active", i === current));
 
       track.style.transform = `translateX(-${current * 100}%)`;
     };
 
-    const leftArrow = document.querySelector<HTMLButtonElement>('.carousel__arrow--left');
-    const rightArrow = document.querySelector<HTMLButtonElement>('.carousel__arrow--right');
+    const leftArrow = document.querySelector<HTMLButtonElement>(".carousel__arrow--left");
+    const rightArrow = document.querySelector<HTMLButtonElement>(".carousel__arrow--right");
 
-    leftArrow?.addEventListener('click', () => {
+    leftArrow?.addEventListener("click", () => {
       current = (current - 1 + sliderItems.length) % sliderItems.length;
       updateSlide();
     });
 
-    rightArrow?.addEventListener('click', () => {
+    rightArrow?.addEventListener("click", () => {
       current = (current + 1) % sliderItems.length;
       updateSlide();
     });
@@ -126,16 +126,16 @@ async function initSlider(): Promise<void> {
       if (intervalId !== null) clearInterval(intervalId);
     };
 
-    carousel.addEventListener('mouseenter', stopAutoSlide);
-    carousel.addEventListener('mouseleave', startAutoSlide);
+    carousel.addEventListener("mouseenter", stopAutoSlide);
+    carousel.addEventListener("mouseleave", startAutoSlide);
 
     updateSlide();
     startAutoSlide();
 
   } catch (err) {
-    console.error('Error loading slider:', err);
+    console.error("Error loading slider:", err);
     showErrorMessage("Something went wrong. Please, refresh the page");
   }
 }
 
-document.addEventListener('DOMContentLoaded', initSlider);
+document.addEventListener("DOMContentLoaded", initSlider);

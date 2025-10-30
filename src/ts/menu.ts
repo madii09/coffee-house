@@ -1,24 +1,24 @@
 
-import { MenuItem, CartItem, CartSize, CartExtra } from '../types/types';
-import { addToCart } from './cart';
-import '../scss/_menu.scss'
+import { MenuItem, CartItem, CartSize, CartExtra } from "../types/types";
+import { addToCart } from "./cart";
+import "../scss/_menu.scss";
 
-const API_BASE = 'https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com';
-const FALLBACK_JSON = '/data/images.json';
+const API_BASE = "https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com";
+const FALLBACK_JSON = "/data/images.json";
 
-const CARDS_CONTAINER_ID = 'menu-items';
-const LOAD_MORE_BTN_ID = 'loadMoreBtn';
-const CATEGORY_BTN_SELECTOR = '.menu-btn';
-const MODAL_ID = 'item-modal';
-const CART_COUNT_SELECTOR = '.cart-count';
+const CARDS_CONTAINER_ID = "menu-items";
+const LOAD_MORE_BTN_ID = "loadMoreBtn";
+const CATEGORY_BTN_SELECTOR = ".menu-btn";
+const MODAL_ID = "item-modal";
+const CART_COUNT_SELECTOR = ".cart-count";
 
-const CART_KEY = 'coffee_cart_v1';
+const CART_KEY = "coffee_cart_v1";
 const ITEMS_TO_SHOW = 4;
 
-let currentCategory: string = 'coffee';
+let currentCategory: string = "coffee";
 let displayedCount: number = ITEMS_TO_SHOW;
 let menuDataGlobal: MenuItem[] = [];
-const token = localStorage.getItem('access_token');
+const token = localStorage.getItem("access_token");
 const userIsLoggedIn: boolean = !!token;
 
 const menuItemsContainer = document.getElementById(CARDS_CONTAINER_ID);
@@ -33,9 +33,9 @@ function formatPrice(val: number): string {
 }
 
 function escapeHtml(str: string | undefined): string {
-  if (!str) return '';
-  return str.replace(/[&<>"'`=\/]/g, (s) =>
-    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[s] ?? s)
+  if (!str) return "";
+  return str.replace(/[&<>"'`=/]/g, (s) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[s] ?? s)
   );
 }
 
@@ -60,44 +60,44 @@ function updateCartCountUI(): void {
 }
 
 function createLoader(): HTMLElement {
-  const div = document.createElement('div');
-  div.className = 'cards-loader';
-  div.textContent = 'Loading...';
+  const div = document.createElement("div");
+  div.className = "cards-loader";
+  div.textContent = "Loading...";
   return div;
 }
 
 function createErrorNode(msg: string): HTMLElement {
-  const p = document.createElement('p');
-  p.className = 'cards-error';
+  const p = document.createElement("p");
+  p.className = "cards-error";
   p.textContent = msg;
   return p;
 }
 
 function showTopNotification(message: string, duration = 4000): void {
-  const existing = document.querySelector('.top-notification');
+  const existing = document.querySelector(".top-notification");
   if (existing) existing.remove();
-  const div = document.createElement('div');
-  div.className = 'top-notification';
+  const div = document.createElement("div");
+  div.className = "top-notification";
   div.textContent = message;
   document.body.prepend(div);
   setTimeout(() => div.remove(), duration);
 }
 
-async function fetchProductsFromBackend(retries = 3, delay = 1000): Promise<MenuItem[]> {
+async function fetchProductsFromBackend(retries = 3): Promise<MenuItem[]> {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
-      const res = await fetch(`${API_BASE}/products`, { cache: 'no-store' });
+      const res = await fetch(`${API_BASE}/products`, { cache: "no-store" });
       if (!res.ok) throw new Error(`Backend error ${res.status}`);
       const json = await res.json();
       return Array.isArray(json) ? json : json.data ?? [];
     } catch (err) {
-      if (attempt < retries) await new Promise((r) => setTimeout(r, delay));
-      else console.warn('All backend attempts failed, falling back to local JSON');
+      showTopNotification("Something went wrong");
     }
+
   }
 
   try {
-    const fallbackRes = await fetch(FALLBACK_JSON, { cache: 'no-store' });
+    const fallbackRes = await fetch(FALLBACK_JSON, { cache: "no-store" });
     const fallbackJson = await fallbackRes.json();
     return fallbackJson as MenuItem[];
   } catch {
@@ -107,14 +107,16 @@ async function fetchProductsFromBackend(retries = 3, delay = 1000): Promise<Menu
 
 async function fetchProductById(id: string): Promise<MenuItem> {
   try {
-    const res = await fetch(`${API_BASE}/products/${encodeURIComponent(id)}`, { cache: 'no-store' });
+    const res = await fetch(`${API_BASE}/products/${encodeURIComponent(id)}`, { cache: "no-store" });
     if (res.ok) {
       const json = await res.json();
       return (json.data ?? json) as MenuItem;
     }
-  } catch { }
+  } catch (_err) {
+    showTopNotification("Something went wrong");
+  }
   const found = menuDataGlobal.find((m) => String(m.id) === String(id) || m.name === id);
-  if (!found) throw new Error('Product not found');
+  if (!found) throw new Error("Product not found");
   return found;
 }
 
@@ -127,15 +129,15 @@ function renderCards(menuData: MenuItem[], category: string): void {
 
   menuItemsContainer.innerHTML = filtered
     .map((item, idx) => {
-      const hideStyle = window.innerWidth <= 768 && idx >= ITEMS_TO_SHOW ? 'display:none;' : '';
-      const imgSrc = item.image ? `/assets/images/${item.image}` : '/assets/images/placeholder.png';
+      const hideStyle = window.innerWidth <= 768 && idx >= ITEMS_TO_SHOW ? "display:none;" : "";
+      const imgSrc = item.image ? `/assets/images/${item.image}` : "/assets/images/placeholder.png";
 
       let finalPrice = Number(item.price);
       let discountPrice: number | undefined;
 
       if (userIsLoggedIn) {
         const firstSize = item.sizes ? Object.values(item.sizes)[0] : undefined;
-        if (firstSize && 'discountPrice' in firstSize && firstSize.discountPrice) {
+        if (firstSize && "discountPrice" in firstSize && firstSize.discountPrice) {
           discountPrice = Number(firstSize.discountPrice);
         }
         if (!discountPrice && item.discountPrice) discountPrice = Number(item.discountPrice);
@@ -147,7 +149,7 @@ function renderCards(menuData: MenuItem[], category: string): void {
         : `<span class="price">$${formatPrice(finalPrice)}</span>`;
 
       return `
-      <div class="menu-card" data-id="${item.id ?? ''}" style="${hideStyle}">
+      <div class="menu-card" data-id="${item.id ?? ""}" style="${hideStyle}">
         <img src="${imgSrc}" alt="${escapeHtml(item.name)}" />
         <div class="menu-info">
           <h3>${escapeHtml(item.name)}</h3>
@@ -156,39 +158,39 @@ function renderCards(menuData: MenuItem[], category: string): void {
         </div>
       </div>`;
     })
-    .join('');
+    .join("");
 
   if (loadMoreBtn) {
     loadMoreBtn.style.display =
-      filtered.length > ITEMS_TO_SHOW && window.innerWidth <= 768 ? 'block' : 'none';
+      filtered.length > ITEMS_TO_SHOW && window.innerWidth <= 768 ? "block" : "none";
   }
 }
 
 function attachCardClickListeners(): void {
-  menuItemsContainer?.addEventListener('click', (e) => {
-    const card = (e.target as HTMLElement).closest('.menu-card') as HTMLElement | null;
+  menuItemsContainer?.addEventListener("click", (e) => {
+    const card = (e.target as HTMLElement).closest(".menu-card") as HTMLElement | null;
     if (!card) return;
-    const id = card.dataset.id ?? card.querySelector('h3')?.textContent ?? '';
+    const id = card.dataset.id ?? card.querySelector("h3")?.textContent ?? "";
     openModalForProduct(id);
   });
 }
 
 async function openModalForProduct(id: string): Promise<void> {
   if (!modal) return;
-  modal.classList.add('active');
-  modal.innerHTML = `<div class="modal-overlay"><div class="modal-loader">Loading...</div></div>`;
+  modal.classList.add("active");
+  modal.innerHTML = "<div class=\"modal-overlay\"><div class=\"modal-loader\">Loading...</div></div>";
 
   let item: MenuItem | null = null;
   try {
     item = await fetchProductById(id);
   } catch (err) {
-    modal.innerHTML = '';
-    showTopNotification('Something went wrong. Please, try again');
+    modal.innerHTML = "";
+    showTopNotification("Something went wrong. Please, try again");
     return;
   }
 
   const basePrice = Number(item.price) || 0;
-  const sizesMap = item.sizes ?? { s: { size: '200 ml', price: basePrice } };
+  const sizesMap = item.sizes ?? { s: { size: "200 ml", price: basePrice } };
   const additives = item.additives ?? [];
 
   const sizesHtml = Object.entries(sizesMap)
@@ -197,12 +199,12 @@ async function openModalForProduct(id: string): Promise<void> {
         ? `Was $${formatPrice(Number(s.price))}, now $${formatPrice(Number((s).discountPrice))}`
         : `$${formatPrice(Number(s.price))}`;
       return `
-        <button class="size-btn ${idx === 0 ? 'active' : ''}" 
+        <button class="size-btn ${idx === 0 ? "active" : ""}" 
           data-key="${escapeHtml(key)}" 
           data-price="${Number(s.price)}" title="${tooltip}">
           ${escapeHtml(key.toUpperCase())} (${escapeHtml(s.size)})</button>`;
     })
-    .join('');
+    .join("");
 
   const additivesHtml = additives.length
     ? additives
@@ -217,10 +219,10 @@ async function openModalForProduct(id: string): Promise<void> {
           </button>`;
         }
       )
-      .join('')
-    : '<span class="no-additives">No additives available</span>';
+      .join("")
+    : "<span class=\"no-additives\">No additives available</span>";
 
-  let imgSrc = '/assets/images/placeholder.png';
+  let imgSrc = "/assets/images/placeholder.png";
   if (item.image) imgSrc = `/assets/images/${item.image}`;
   else {
     try {
@@ -229,7 +231,9 @@ async function openModalForProduct(id: string): Promise<void> {
         (img: { name: string }) => img.name.toLowerCase() === item.name.toLowerCase()
       );
       if (match?.image) imgSrc = `/assets/images/${match.image}`;
-    } catch { }
+    } catch (_err) {
+      showTopNotification("Something went wrong");
+    }
   }
 
   modal.innerHTML = `
@@ -269,18 +273,18 @@ async function openModalForProduct(id: string): Promise<void> {
         </div>
       </div>
     </div>
-  </div>`
+  </div>`;
 
   setupModalInteractivity(item, basePrice);
 }
 
 function setupModalInteractivity(item: MenuItem, basePrice: number): void {
   if (!modal) return;
-  const modalPriceNode = modal.querySelector('#modal-price') as HTMLElement;
-  const sizeOptionsEl = modal.querySelector('#size-options')!;
-  const additiveOptionsEl = modal.querySelector('#additive-options')!;
-  const addToCartBtn = modal.querySelector('.modal-add-to-cart') as HTMLButtonElement;
-  const closeBtn = modal.querySelector('.modal-close-btn') as HTMLButtonElement;
+  const modalPriceNode = modal.querySelector("#modal-price") as HTMLElement;
+  const sizeOptionsEl = modal.querySelector("#size-options")!;
+  const additiveOptionsEl = modal.querySelector("#additive-options")!;
+  const addToCartBtn = modal.querySelector(".modal-add-to-cart") as HTMLButtonElement;
+  const closeBtn = modal.querySelector(".modal-close-btn") as HTMLButtonElement;
 
   const sizesMap = item.sizes ?? {};
   const additives = item.additives ?? [];
@@ -353,34 +357,34 @@ function setupModalInteractivity(item: MenuItem, basePrice: number): void {
   // Initialize correct starting price
   updatePrice();
 
-  sizeOptionsEl.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('.size-btn') as HTMLButtonElement | null;
+  sizeOptionsEl.addEventListener("click", (e) => {
+    const btn = (e.target as HTMLElement).closest(".size-btn") as HTMLButtonElement | null;
     if (!btn) return;
-    sizeOptionsEl.querySelectorAll('.size-btn').forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
+    sizeOptionsEl.querySelectorAll(".size-btn").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
     selectedSizeKey = btn.dataset.key ?? null;
     updatePrice();
   });
 
-  additiveOptionsEl.addEventListener('click', (e) => {
-    const btn = (e.target as HTMLElement).closest('.add-btn') as HTMLButtonElement | null;
+  additiveOptionsEl.addEventListener("click", (e) => {
+    const btn = (e.target as HTMLElement).closest(".add-btn") as HTMLButtonElement | null;
     if (!btn) return;
-    const name = btn.dataset.name ?? '';
-    btn.classList.toggle('active');
-    if (btn.classList.contains('active')) selectedExtras.add(name);
+    const name = btn.dataset.name ?? "";
+    btn.classList.toggle("active");
+    if (btn.classList.contains("active")) selectedExtras.add(name);
     else selectedExtras.delete(name);
     updatePrice();
   });
 
-  addToCartBtn.addEventListener('click', async () => {
+  addToCartBtn.addEventListener("click", async () => {
     if (!item.image) {
       const match = menuDataGlobal.find(m => m.name === item.name || m.id === item.id);
       if (match?.image) item.image = match.image;
     }
 
     const selectedSize: CartSize = {
-      key: selectedSizeKey ?? 's',
-      label: selectedSizeKey?.toUpperCase() ?? 'S',
+      key: selectedSizeKey ?? "s",
+      label: selectedSizeKey?.toUpperCase() ?? "S",
       addPrice: selectedSizeKey ? Number(sizesMap[selectedSizeKey]?.price) || 0 : 0,
     };
 
@@ -392,7 +396,7 @@ function setupModalInteractivity(item: MenuItem, basePrice: number): void {
     const cartItem: CartItem = {
       id: item.id,
       name: item.name,
-      image: item.image || 'placeholder.png',
+      image: item.image || "placeholder.png",
       basePrice,
       discountPrice: userIsLoggedIn
         ? selectedSizeKey && sizesMap[selectedSizeKey]?.discountPrice
@@ -420,26 +424,26 @@ function setupModalInteractivity(item: MenuItem, basePrice: number): void {
     closeModal();
   });
 
-  closeBtn.addEventListener('click', closeModal);
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-  modal.addEventListener('click', (e) => {
-    const content = modal.querySelector('.modal-content');
+  closeBtn.addEventListener("click", closeModal);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+  modal.addEventListener("click", (e) => {
+    const content = modal.querySelector(".modal-content");
     if (content && !content.contains(e.target as Node)) closeModal();
   });
 }
 
 function closeModal(): void {
   if (!modal) return;
-  modal.classList.remove('active');
-  modal.innerHTML = '';
+  modal.classList.remove("active");
+  modal.innerHTML = "";
 }
 
 function attachCategoryButtons(): void {
   categoryButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      categoryButtons.forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderCards(menuDataGlobal, btn.dataset.category ?? 'coffee');
+    btn.addEventListener("click", () => {
+      categoryButtons.forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderCards(menuDataGlobal, btn.dataset.category ?? "coffee");
     });
   });
 }
@@ -451,34 +455,34 @@ export async function initMenuPage(): Promise<void> {
 
   try {
     const backendProducts = await fetchProductsFromBackend();
-    const imgRes = await fetch(FALLBACK_JSON, { cache: 'no-store' });
+    const imgRes = await fetch(FALLBACK_JSON, { cache: "no-store" });
     const imagesData = await imgRes.json();
 
     menuDataGlobal = backendProducts.map((product) => {
       const matchedImage = imagesData.find(
         (img: { name: string }) => img.name.toLowerCase() === product.name.toLowerCase()
       );
-      return { ...product, image: matchedImage ? matchedImage.image : 'placeholder.png' };
+      return { ...product, image: matchedImage ? matchedImage.image : "placeholder.png" };
     });
 
-    renderCards(menuDataGlobal, 'coffee');
+    renderCards(menuDataGlobal, "coffee");
     attachCardClickListeners();
     attachCategoryButtons();
     updateCartCountUI();
 
     loader.remove();
 
-    loadMoreBtn?.addEventListener('click', () => {
-      const cards = menuItemsContainer.querySelectorAll<HTMLElement>('.menu-card');
+    loadMoreBtn?.addEventListener("click", () => {
+      const cards = menuItemsContainer.querySelectorAll<HTMLElement>(".menu-card");
       cards.forEach((card, idx) => {
-        if (idx < displayedCount + ITEMS_TO_SHOW) card.style.display = 'block';
+        if (idx < displayedCount + ITEMS_TO_SHOW) card.style.display = "block";
       });
       displayedCount += ITEMS_TO_SHOW;
-      if (displayedCount >= cards.length) loadMoreBtn!.style.display = 'none';
+      if (displayedCount >= cards.length) loadMoreBtn!.style.display = "none";
     });
   } catch {
-    menuItemsContainer.replaceChildren(createErrorNode('Something went wrong. Please, refresh the page'));
+    menuItemsContainer.replaceChildren(createErrorNode("Something went wrong. Please, refresh the page"));
   }
 }
 
-initMenuPage().catch((err) => console.error('initMenuPage error', err));
+initMenuPage().catch((err) => console.error("initMenuPage error", err));

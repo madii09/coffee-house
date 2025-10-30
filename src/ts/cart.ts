@@ -1,7 +1,7 @@
-import { CartItem } from '../types/types';
+import { CartItem } from "../types/types";
 
-const CART_KEY = 'coffee_cart_v1';
-const API_BASE = 'https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com';
+const CART_KEY = "coffee_cart_v1";
+const API_BASE = "https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com";
 
 function readCartLocal(): CartItem[] {
   try {
@@ -18,7 +18,7 @@ function saveCartLocal(cart: CartItem[]): void {
 }
 
 function isLoggedIn(): boolean {
-  return !!localStorage.getItem('access_token');
+  return !!localStorage.getItem("access_token");
 }
 
 function formatPrice(val: number): string {
@@ -28,12 +28,12 @@ function formatPrice(val: number): string {
 function escapeHtml(str: string): string {
   return str
     ? str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#039;')
-    : '';
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;")
+    : "";
 }
 
 function $$<T extends HTMLElement>(sel: string): T | null {
@@ -41,27 +41,27 @@ function $$<T extends HTMLElement>(sel: string): T | null {
 }
 
 export function updateCartCounter(): void {
-  const counterEl = $$('.cart-count');
-  const iconEl = $$('.cart-icon');
+  const counterEl = $$(".cart-count");
+  const iconEl = $$(".cart-icon");
 
   const cart = readCartLocal();
   const totalItems = cart.reduce((s, it) => s + it.quantity, 0);
 
   if (counterEl) counterEl.textContent = totalItems.toString();
-  if (iconEl) iconEl.classList.toggle('hidden', totalItems === 0 && !isLoggedIn());
+  if (iconEl) iconEl.classList.toggle("hidden", totalItems === 0 && !isLoggedIn());
 }
 
 export function showTopNotification(msg: string): void {
-  const old = document.querySelector('.top-notification');
+  const old = document.querySelector(".top-notification");
   if (old) old.remove();
 
-  const div = document.createElement('div');
-  div.className = 'top-notification';
+  const div = document.createElement("div");
+  div.className = "top-notification";
   div.textContent = msg;
   document.body.appendChild(div);
 
-  setTimeout(() => div.classList.add('show'), 50);
-  setTimeout(() => div.classList.remove('show'), 4000);
+  setTimeout(() => div.classList.add("show"), 50);
+  setTimeout(() => div.classList.remove("show"), 4000);
   setTimeout(() => div.remove(), 4500);
 }
 
@@ -94,7 +94,7 @@ export function addToCart(item: CartItem): void {
 }
 
 function renderCartPage(): void {
-  const root = $$('.cart-root');
+  const root = $$(".cart-root");
   if (!root) return;
 
   const cart = readCartLocal();
@@ -125,12 +125,12 @@ function renderCartPage(): void {
     <div class="cart-item" data-idx="${idx}">
     <div class="ci-left">
       <button class="ci-remove" data-idx="${idx}" aria-label="Remove item">🗑</button>
-      <img src="${c.image?.startsWith('http') ? c.image : `./assets/images/${c.image || 'placeholder.png'}`}" 
+      <img src="${c.image?.startsWith("http") ? c.image : `./assets/images/${c.image || "placeholder.png"}`}" 
            alt="${escapeHtml(c.name)}" width="80" />
       <div class="ci-name">${escapeHtml(c.name)}</div>
       <div class="ci-size">
         Size: ${escapeHtml(c.size.label)}
-        ${c.extras.length ? '| Extras: ' + c.extras.map((x) => escapeHtml(x.name)).join(', ') : ''}
+        ${c.extras.length ? "| Extras: " + c.extras.map((x) => escapeHtml(x.name)).join(", ") : ""}
       </div>
     </div>
 
@@ -140,7 +140,7 @@ function renderCartPage(): void {
   </div>`;
       }
     )
-    .join('');
+    .join("");
 
   const total = cart.reduce((s, it) => {
     if (isLoggedIn() && it.discountPrice) return s + it.discountPrice;
@@ -151,7 +151,7 @@ function renderCartPage(): void {
     ? `
     <div class="checkout-section">
       <div class="delivery-address">
-        Delivery address: <strong>${escapeHtml(localStorage.getItem('delivery_address') || 'No address')}</strong>
+        Delivery address: <strong>${escapeHtml(localStorage.getItem("delivery_address") || "No address")}</strong>
       </div>
       <button class="confirm-order-btn">Confirm Order</button>
     </div>`
@@ -171,8 +171,8 @@ function renderCartPage(): void {
     </div>
   `;
 
-  root.querySelectorAll('.ci-remove').forEach((btn) =>
-    btn.addEventListener('click', (ev) => {
+  root.querySelectorAll(".ci-remove").forEach((btn) =>
+    btn.addEventListener("click", (ev) => {
       const idx = Number((ev.currentTarget as HTMLElement).dataset.idx);
       const cur = readCartLocal();
       cur.splice(idx, 1);
@@ -181,17 +181,17 @@ function renderCartPage(): void {
     })
   );
 
-  root.querySelector('.sign-in-btn')?.addEventListener('click', () => (location.href = '/signin.html'));
-  root.querySelector('.register-btn')?.addEventListener('click', () => (location.href = '/register.html'));
+  root.querySelector(".sign-in-btn")?.addEventListener("click", () => (location.href = "/signin.html"));
+  root.querySelector(".register-btn")?.addEventListener("click", () => (location.href = "/register.html"));
 
-  root.querySelector('.confirm-order-btn')?.addEventListener('click', async () => {
-    const status = root.querySelector('.order-status');
-    if (status) status.innerHTML = '<div class="order-loader">Placing order...</div>';
+  root.querySelector(".confirm-order-btn")?.addEventListener("click", async () => {
+    const status = root.querySelector(".order-status");
+    if (status) status.innerHTML = "<div class=\"order-loader\">Placing order...</div>";
 
     try {
       const cartToSend = readCartLocal();
-      const token = localStorage.getItem('access_token');
-      if (!token) throw new Error('Not logged in');
+      const token = localStorage.getItem("access_token");
+      if (!token) throw new Error("Not logged in");
 
       const payload = {
         items: cartToSend.map((it) => ({
@@ -204,9 +204,9 @@ function renderCartPage(): void {
       };
 
       const res = await fetch(`${API_BASE}/orders/confirm`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
@@ -214,28 +214,28 @@ function renderCartPage(): void {
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.message || 'Order failed');
+      if (!res.ok) throw new Error(data.message || "Order failed");
 
       saveCartLocal([]);
       if (status)
         status.innerHTML = `
       <div class="order-success">
-        ${data.data?.message || 'Order placed successfully!'}<br/>
-        <small>Order ID: ${data.data?.orderId || '-'}</small>
+        ${data.data?.message || "Order placed successfully!"}<br/>
+        <small>Order ID: ${data.data?.orderId || "-"}</small>
       </div>`;
-      showTopNotification('Your order is confirmed');
+      showTopNotification("Thank you for your order! Our manager will contact you shortly");
       renderCartPage();
     } catch (err) {
-      console.error('Order error', err);
-      showTopNotification('Something went wrong. Please, try again');
-      if (status) status.innerHTML = `<div class="order-error">Order failed. Please try again.</div>`;
+      console.error("Order error", err);
+      showTopNotification("Something went wrong. Please, try again");
+      if (status) status.innerHTML = "<div class=\"order-error\">Order failed. Please try again.</div>";
     }
   });
 
   updateCartCounter();
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   renderCartPage();
   updateCartCounter();
 });

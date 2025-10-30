@@ -1,7 +1,7 @@
-import { CartItem } from '@/types/types';
+import { CartItem } from "@/types/types";
 
-export const CART_KEY = 'coffee_cart_v1';
-const CART_COUNT_SELECTOR = '.cart-count';
+export const CART_KEY = "coffee_cart_v1";
+const CART_COUNT_SELECTOR = ".cart-count";
 
 export function readCart(): CartItem[] {
   try {
@@ -23,7 +23,7 @@ export function updateCartCountUI(): void {
 
   document.querySelectorAll<HTMLSpanElement>(CART_COUNT_SELECTOR).forEach(node => {
     node.textContent = String(totalItems);
-    node.style.display = 'inline-block';
+    node.style.display = "inline-block";
   });
 }
 
