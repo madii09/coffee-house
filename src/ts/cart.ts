@@ -1,7 +1,7 @@
 import { CartItem } from '../types/types';
 
 const CART_KEY = 'coffee_cart_v1';
-const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = 'https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com';
 
 function readCartLocal(): CartItem[] {
   try {

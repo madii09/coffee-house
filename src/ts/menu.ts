@@ -3,8 +3,8 @@ import { MenuItem, CartItem, CartSize, CartExtra } from '../types/types';
 import { addToCart } from './cart';
 import '../scss/_menu.scss'
 
-const API_BASE = import.meta.env.VITE_API_BASE;
-const FALLBACK_JSON = import.meta.env.VITE_FALLBACK_JSON;
+const API_BASE = 'https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com';
+const FALLBACK_JSON = '/data/images.json';
 
 const CARDS_CONTAINER_ID = 'menu-items';
 const LOAD_MORE_BTN_ID = 'loadMoreBtn';

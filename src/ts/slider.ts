@@ -1,6 +1,6 @@
 import { Product } from '../types/types';
 
-const API_BASE = import.meta.env.VITE_API_BASE;
+const API_BASE = 'https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com';
 
 type ImageMapItem = { name: string; image: string };
 

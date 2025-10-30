@@ -29,4 +29,11 @@ export default defineConfig({
   esbuild: {
     target: 'esnext',
   },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+      '@ts': path.resolve(__dirname, './src/ts'),
+      '@scss': path.resolve(__dirname, './src/scss'),
+    },
+  },
 });

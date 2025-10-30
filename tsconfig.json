@@ -30,13 +30,12 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
-    "types": [
-      "node"
-    ]
   },
   "include": [
     "src",
-    "src/env.d.ts"
+    "src/env.d.ts",
+    "src/global.d.ts",
+    "public/data"
   ],
   "exclude": [
     "node_modules",
