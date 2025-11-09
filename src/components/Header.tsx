@@ -2,16 +2,20 @@ import { Link, useNavigate } from 'react-router-dom';
 import '../styles/_header.scss';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/useCart';
-import { FiLogOut } from 'react-icons/fi'; // <- import logout icon
+import { FiLogOut } from 'react-icons/fi';
 
 const Header = () => {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
-  const { totalItems } = useCart();
+  const { totalItems, clearCart } = useCart();
 
   const handleAuthClick = () => {
     if (currentUser) {
       logout();
+      clearCart();
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('delivery_address');
+      window.location.reload();
     } else {
       navigate('/auth');
     }

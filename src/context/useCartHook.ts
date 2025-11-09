@@ -1,25 +1,31 @@
-
 import { useState, useEffect } from 'react';
 import type { CartItem, CartContextType } from '../types/types';
-
-const CART_KEY = 'coffee_cart_v1';
+import { useAuth } from '../context/AuthContext';
 
 export const useCartHook = (): CartContextType => {
+  const { currentUser } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  useEffect(() => {
-    const saved = localStorage.getItem(CART_KEY);
-    if (saved) setCart(JSON.parse(saved));
-  }, []);
+  const getCartKey = () => (currentUser ? `cart_user_${currentUser.id}` : 'cart_guest');
 
   useEffect(() => {
-    if (cart.length > 0) {
-      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    if (currentUser) {
+      const saved = localStorage.getItem(getCartKey());
+      setCart(saved ? JSON.parse(saved) : []);
     } else {
-      localStorage.removeItem(CART_KEY);
+      setCart([]);
     }
-  }, [cart]);
+  }, [currentUser]);
 
+  useEffect(() => {
+    if (currentUser) {
+      if (cart.length > 0) {
+        localStorage.setItem(getCartKey(), JSON.stringify(cart));
+      } else {
+        localStorage.removeItem(getCartKey());
+      }
+    }
+  }, [cart, currentUser]);
 
   const addItem = (item: CartItem) => {
     setCart((prev) => {
@@ -37,7 +43,6 @@ export const useCartHook = (): CartContextType => {
           totalPrice: prev[existingIndex].totalPrice + item.totalPrice,
           discountPrice: item.discountPrice ?? prev[existingIndex].discountPrice,
         };
-
         return [
           ...prev.slice(0, existingIndex),
           updatedItem,

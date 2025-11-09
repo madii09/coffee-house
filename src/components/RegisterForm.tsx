@@ -15,9 +15,19 @@ export const RegisterForm = () => {
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | ''>('');
   const [error, setError] = useState('');
 
+  const passwordError =
+    password.length > 0 && password.length < 6
+      ? 'Password must be at least 6 characters long'
+      : '';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
+      return;
+    }
 
     if (password !== confirm) {
       setError('Passwords do not match');
@@ -59,18 +69,24 @@ export const RegisterForm = () => {
         value={login}
         onChange={(e) => setLogin(e.target.value)}
       />
-      <input
-        type='password'
-        placeholder='Password'
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
+
+      <div>
+        <input
+          type='password'
+          placeholder='Password'
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        {passwordError && <div style={{ color: 'red' }}>{passwordError}</div>}
+      </div>
+
       <input
         type='password'
         placeholder='Confirm Password'
         value={confirm}
         onChange={(e) => setConfirm(e.target.value)}
       />
+
       <input
         placeholder='City'
         value={city}
@@ -113,6 +129,7 @@ export const RegisterForm = () => {
       </div>
 
       <button type='submit'>Register</button>
+
       {error && <div style={{ color: 'red' }}>{error}</div>}
     </form>
   );

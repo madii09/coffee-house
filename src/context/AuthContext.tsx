@@ -99,6 +99,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     localStorage.removeItem('currentUser');
     setCurrentUser(null);
+    window.location.reload();
   };
 
   return (
