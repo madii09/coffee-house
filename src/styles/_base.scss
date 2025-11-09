@@ -57,13 +57,21 @@ body {
 }
 
 .header {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  margin: 20px 0px;
+  z-index: 1000;
+  background-color: $background-main;
+
+  margin: 0;
 
   &__container {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0 2rem;
+    height: 80px;
   }
   .menu-link-mobile {
     display: none;
@@ -188,7 +196,7 @@ body {
 
 .enjoy {
   width: 100%;
-  margin-top: 20px;
+  margin-top: 80px;
 
   .container {
     position: relative;
@@ -223,7 +231,6 @@ body {
     max-width: 530px;
     h1 {
       font-size: 72px;
-      margin-bottom: 25px;
       color: $text-color-light;
 
       .highlight {

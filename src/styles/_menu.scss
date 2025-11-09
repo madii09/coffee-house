@@ -2,6 +2,7 @@
 .menu {
   display: flex;
   flex-direction: column;
+  margin-top: 80px;
 }
 .menu-text {
   display: flex;
@@ -264,6 +265,34 @@
       }
     }
   }
+}
+
+.prices,
+.price-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .original-price {
+    color: #888;
+    text-decoration: line-through;
+  }
+
+  .discount-price {
+    font-weight: 600;
+    color: #e63946;
+  }
+
+  .price {
+    font-weight: 600;
+    color: #403f3d;
+  }
+}
+.error-message {
+  color: red;
+  font-weight: 500;
+  text-align: center;
+  margin: 2rem 0;
 }
 
 @keyframes fadeIn {
