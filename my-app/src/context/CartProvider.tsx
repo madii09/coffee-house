@@ -1,4 +1,3 @@
-// context/CartProvider.tsx
 import type { ReactNode } from 'react';
 import { CartContext } from './CartContext';
 import { useCartHook } from './useCartHook';

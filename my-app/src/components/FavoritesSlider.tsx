@@ -5,7 +5,6 @@ import imagesData from '../data/images.json';
 
 type CoffeeItemWithImage = CoffeeItem & { image: string };
 
-// Build image map from local JSON
 const imageMap: Record<string, string> = {};
 imagesData.forEach((item: { name: string; image: string }) => {
   imageMap[item.name] = `/assets/images/${item.image}`;
@@ -18,7 +17,6 @@ const FavoritesSlider: React.FC = () => {
 
   const isUserLoggedIn = () => Boolean(localStorage.getItem('access_token'));
 
-  // Fetch favorites and attach image
   useEffect(() => {
     async function loadFavorites() {
       try {
@@ -39,7 +37,6 @@ const FavoritesSlider: React.FC = () => {
     loadFavorites();
   }, []);
 
-  // Auto-slide
   useEffect(() => {
     if (slides.length === 0) return;
 

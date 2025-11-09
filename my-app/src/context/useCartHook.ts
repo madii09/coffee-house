@@ -1,4 +1,4 @@
-// context/useCartHook.ts
+
 import { useState, useEffect } from 'react';
 import type { CartItem, CartContextType } from '../types/types';
 
@@ -7,18 +7,20 @@ const CART_KEY = 'coffee_cart_v1';
 export const useCartHook = (): CartContextType => {
   const [cart, setCart] = useState<CartItem[]>([]);
 
-  // Load cart from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem(CART_KEY);
     if (saved) setCart(JSON.parse(saved));
   }, []);
 
-  // Save cart to localStorage on change
   useEffect(() => {
-    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    if (cart.length > 0) {
+      localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    } else {
+      localStorage.removeItem(CART_KEY);
+    }
   }, [cart]);
 
-  // Add item to cart (immutable)
+
   const addItem = (item: CartItem) => {
     setCart((prev) => {
       const existingIndex = prev.findIndex(
@@ -47,7 +49,6 @@ export const useCartHook = (): CartContextType => {
     });
   };
 
-  // Remove item by index
   const removeItem = (idx: number) => {
     setCart((prev) => {
       const newCart = [...prev];
@@ -56,10 +57,8 @@ export const useCartHook = (): CartContextType => {
     });
   };
 
-  // Clear the cart
   const clearCart = () => setCart([]);
 
-  // Compute totals
   const totalItems = cart.reduce((sum, it) => sum + it.quantity, 0);
   const totalPrice = cart.reduce(
     (sum, it) => sum + (it.discountPrice ?? it.totalPrice),

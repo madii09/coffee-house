@@ -3,13 +3,15 @@ import { useCart } from '../context/useCart';
 import { showTopNotification } from '../utils/cartHelpers';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { isLoggedIn } from '../utils/auth'; // optional helper
+import { useAuth } from '../context/AuthContext';
+import images from '../data/images.json';
 
 const API_BASE = 'https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com';
 
 const Cart: React.FC = () => {
   const { cart, removeItem, clearCart, totalPrice } = useCart();
   const [orderStatus, setOrderStatus] = useState<string>('');
+  const { currentUser } = useAuth();
 
   const confirmOrder = async () => {
     setOrderStatus('Placing order...');
@@ -54,10 +56,22 @@ const Cart: React.FC = () => {
     }
   };
 
+  const getImagePath = (name: string, fallback?: string) => {
+    const matched = images.find(
+      (img: { name: string; image: string }) =>
+        img.name.toLowerCase() === name.toLowerCase()
+    );
+
+    return matched
+      ? `/assets/images/${matched.image}`
+      : fallback
+      ? `/assets/images/${fallback}`
+      : '/assets/images/placeholder.png';
+  };
+
   return (
     <>
       <Header />
-
       <main className='container cart'>
         <h1 className='page-title'>Cart</h1>
 
@@ -79,15 +93,13 @@ const Cart: React.FC = () => {
                     >
                       🗑
                     </button>
+
                     <img
-                      src={
-                        c.image?.startsWith('http')
-                          ? c.image
-                          : `/assets/images/${c.image || 'placeholder.png'}`
-                      }
+                      src={getImagePath(c.name, c.image)}
                       alt={c.name}
                       width={80}
                     />
+
                     <div className='ci-name'>{c.name}</div>
                     <div className='ci-size'>
                       Size: {c.size.label}
@@ -99,7 +111,7 @@ const Cart: React.FC = () => {
 
                   <div className='ci-right'>
                     <div className='ci-price'>
-                      {isLoggedIn() && c.discountPrice ? (
+                      {c.discountPrice !== undefined ? (
                         <>
                           <span
                             style={{
@@ -108,14 +120,14 @@ const Cart: React.FC = () => {
                               marginRight: '0.5rem',
                             }}
                           >
-                            ${c.totalPrice.toFixed(2)}
+                            ${c.basePrice.toFixed(2)}
                           </span>
                           <span style={{ color: '#403F3D', fontWeight: 600 }}>
                             ${c.discountPrice.toFixed(2)}
                           </span>
                         </>
                       ) : (
-                        `$${c.totalPrice.toFixed(2)}`
+                        `$${c.basePrice.toFixed(2)}`
                       )}
                     </div>
                   </div>
@@ -125,10 +137,37 @@ const Cart: React.FC = () => {
 
             <div className='cart-summary'>
               <div className='cart-total'>
-                Order total: <strong>${totalPrice.toFixed(2)}</strong>
+                Order total:{' '}
+                {cart.some((it) => it.discountPrice !== undefined) ? (
+                  <>
+                    <span
+                      style={{
+                        textDecoration: 'line-through',
+                        color: '#888',
+                        marginRight: '0.5rem',
+                      }}
+                    >
+                      $
+                      {cart
+                        .reduce((sum, it) => sum + it.basePrice, 0)
+                        .toFixed(2)}
+                    </span>
+                    <span style={{ color: '#403F3D', fontWeight: 600 }}>
+                      $
+                      {cart
+                        .reduce(
+                          (sum, it) => sum + (it.discountPrice ?? it.basePrice),
+                          0
+                        )
+                        .toFixed(2)}
+                    </span>
+                  </>
+                ) : (
+                  <strong>${totalPrice.toFixed(2)}</strong>
+                )}
               </div>
 
-              {isLoggedIn() ? (
+              {currentUser ? (
                 <div className='checkout-section'>
                   <div className='delivery-address'>
                     Delivery address:{' '}
@@ -156,7 +195,6 @@ const Cart: React.FC = () => {
           </div>
         )}
       </main>
-
       <Footer />
     </>
   );

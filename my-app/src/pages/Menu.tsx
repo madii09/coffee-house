@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import '../styles/_menu.scss';
 import Modal from '../components/Modal';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import MenuCard from '../components/MenuCard';
-import { fetchMenuItems } from '../services/api';
+import { fetchMenuItems, fetchMenuItemById } from '../services/api';
 import type { MenuItem } from '../types/types';
+import { useAuth } from '../context/AuthContext';
 
 const Menu = () => {
+  const { currentUser } = useAuth();
+  const navigate = useNavigate();
+
   const [category, setCategory] = useState<'coffee' | 'tea' | 'dessert'>(
     'coffee'
   );
@@ -15,12 +20,12 @@ const Menu = () => {
   const [visibleCount, setVisibleCount] = useState(4);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [loading, setLoading] = useState(true);
+  const [modalLoading, setModalLoading] = useState(false);
 
   useEffect(() => {
     const loadItems = async () => {
       try {
         const data = await fetchMenuItems();
-        console.log('Fetched items:', data);
         setItems(data);
       } catch (err) {
         console.error('Failed to fetch menu items', err);
@@ -28,12 +33,23 @@ const Menu = () => {
         setLoading(false);
       }
     };
-
     loadItems();
   }, []);
 
   const filtered = items.filter((it) => it.category === category);
   const visibleItems = filtered.slice(0, visibleCount);
+
+  const handleCardClick = async (item: MenuItem) => {
+    try {
+      setModalLoading(true);
+      const fullItem = await fetchMenuItemById(Number(item.id));
+      setSelectedItem(fullItem);
+    } catch (err) {
+      console.error('Failed to fetch item details', err);
+    } finally {
+      setModalLoading(false);
+    }
+  };
 
   return (
     <>
@@ -69,7 +85,12 @@ const Menu = () => {
           ) : (
             <div id='menu-items' className='menu-items'>
               {visibleItems.map((item) => (
-                <MenuCard key={item.id} item={item} onClick={setSelectedItem} />
+                <MenuCard
+                  key={item.id}
+                  item={item}
+                  onClick={handleCardClick}
+                  isLoggedIn={!!currentUser}
+                />
               ))}
             </div>
           )}
@@ -84,6 +105,8 @@ const Menu = () => {
             </button>
           )}
         </section>
+
+        {modalLoading && <p className='text-center'>Loading details...</p>}
 
         {selectedItem && (
           <Modal item={selectedItem} onClose={() => setSelectedItem(null)} />

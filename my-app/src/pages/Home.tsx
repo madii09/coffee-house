@@ -9,7 +9,6 @@ const Home = () => {
       <Header />
 
       <main>
-        {/* HERO SECTION */}
         <section id='enjoy' className='enjoy'>
           <div className='container'>
             <video
@@ -41,35 +40,14 @@ const Home = () => {
           </div>
         </section>
 
-        {/* FAVOURITES SECTION */}
         <section id='favourites' className='favourites'>
           <h2>
             Choose your <span className='highlight'>favorite</span> coffee
           </h2>
 
           <FavoritesSlider />
-          {/* <div className='carousel container'>
-            <button className='carousel__arrow carousel__arrow--left'>
-              <img src='/assets/icons/Vector-left.png' alt='Vector left' />
-            </button>
-
-            <div className='carousel__track'></div>
-
-            <button className='carousel__arrow carousel__arrow--right'>
-              <img src='/assets/icons/Vector-right.png' alt='Vector right' />
-            </button>
-          </div>
-
-          <div className='text'>
-            <span className='name'></span>
-            <p className='desc'></p>
-            <div className='price'></div>
-          </div>
-
-          <div className='carousel__progress'></div> */}
         </section>
 
-        {/* ABOUT SECTION */}
         <section id='about' className='about container'>
           <h2>
             Resource is
@@ -109,7 +87,6 @@ const Home = () => {
           </div>
         </section>
 
-        {/* MOBILE APP SECTION */}
         <section id='mobile-app' className='mobile-app container'>
           <div className='text-mobile'>
             <h2>

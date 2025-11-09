@@ -5,17 +5,22 @@ import Menu from './pages/Menu';
 import Cart from './pages/Cart';
 import './styles/main.scss';
 import { Toaster } from 'react-hot-toast';
+import { AuthPage } from './pages/AuthPage';
+import { AuthProvider } from './context/AuthContext';
 
 const App = () => {
   return (
-    <CartProvider>
-      <Toaster />
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/menu' element={<Menu />} />
-        <Route path='/cart' element={<Cart />} />
-      </Routes>
-    </CartProvider>
+    <AuthProvider>
+      <CartProvider>
+        <Toaster />
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/auth' element={<AuthPage />} />
+          <Route path='/menu' element={<Menu />} />
+          <Route path='/cart' element={<Cart />} />
+        </Routes>
+      </CartProvider>
+    </AuthProvider>
   );
 };
 

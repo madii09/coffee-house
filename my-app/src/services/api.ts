@@ -1,6 +1,6 @@
 import type { CoffeeItem } from "../types/products";
-import type { MenuItem } from "../types/types";
-import images from "../data/images.json"; // ✅ import JSON directly
+import type { Additive, MenuItem, Size } from "../types/types";
+import images from "../data/images.json";
 
 const API_BASE = "https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com";
 
@@ -27,7 +27,6 @@ export async function fetchMenuItems(): Promise<MenuItem[]> {
     const json = await res.json();
     const data: MenuItem[] = Array.isArray(json.data) ? json.data : [];
 
-    // Attach images from imported JSON
     return data.map((item) => {
       const matched = images.find(
         (img: { name: string; image: string }) =>
@@ -46,3 +45,44 @@ export async function fetchMenuItems(): Promise<MenuItem[]> {
     return [];
   }
 }
+
+export const fetchMenuItemById = async (id: number): Promise<MenuItem> => {
+  const res = await fetch(`${API_BASE}/products/${id}`);
+  if (!res.ok) throw new Error("Failed to fetch menu item");
+
+  const { data } = await res.json();
+
+  const sizes: Record<string, Size> | undefined = data.sizes
+    ? Object.fromEntries(
+      Object.entries(data.sizes).map(([key, val]) => {
+        const sizeVal = val as { size: string; price: string; discountPrice?: string };
+        return [
+          key,
+          {
+            size: sizeVal.size,
+            price: Number(sizeVal.price),
+            discountPrice: sizeVal.discountPrice
+              ? Number(sizeVal.discountPrice)
+              : undefined,
+          },
+        ];
+      })
+    )
+    : undefined;
+
+  const additives: Additive[] | undefined = data.additives
+    ? data.additives.map((a: { name: string; price: string; discountPrice?: string }) => ({
+      name: a.name,
+      price: Number(a.price),
+      discountPrice: a.discountPrice ? Number(a.discountPrice) : undefined,
+    }))
+    : undefined;
+
+  return {
+    ...data,
+    price: Number(data.price),
+    discountPrice: data.discountPrice ? Number(data.discountPrice) : undefined,
+    sizes,
+    additives,
+  };
+};

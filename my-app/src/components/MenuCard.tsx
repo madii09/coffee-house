@@ -1,15 +1,19 @@
 import React from 'react';
 import type { MenuItem } from '../types/types';
 
-interface Props {
+interface MenuCardProps {
   item: MenuItem;
   onClick: (item: MenuItem) => void;
+  isLoggedIn: boolean;
 }
 
-const MenuCard: React.FC<Props> = ({ item, onClick }) => {
-  // Ensure price and discount are always numbers
+const MenuCard: React.FC<MenuCardProps> = ({ item, onClick, isLoggedIn }) => {
   const price = Number(item.price ?? 0);
   const discount = item.discountPrice ? Number(item.discountPrice) : null;
+
+  const displayPrice =
+    isLoggedIn && discount && discount < price ? discount : price;
+  const showOriginalPrice = isLoggedIn && discount && discount < price;
 
   return (
     <div className='menu-card' onClick={() => onClick(item)}>
@@ -18,18 +22,20 @@ const MenuCard: React.FC<Props> = ({ item, onClick }) => {
         <h3>{item.name}</h3>
         <p>{item.description}</p>
         <div className='prices'>
-          {discount && discount < price ? (
-            <>
-              <span className='original-price line-through text-gray-500'>
-                ${price.toFixed(2)}
-              </span>
-              <span className='discount-price text-red-600 font-semibold'>
-                ${discount.toFixed(2)}
-              </span>
-            </>
-          ) : (
-            <span className='price font-semibold'>${price.toFixed(2)}</span>
+          {showOriginalPrice && (
+            <span className='original-price line-through text-gray-500'>
+              ${price.toFixed(2)}
+            </span>
           )}
+          <span
+            className={`price ${
+              showOriginalPrice
+                ? 'discount-price text-red-600 font-semibold'
+                : 'font-semibold'
+            }`}
+          >
+            ${displayPrice.toFixed(2)}
+          </span>
         </div>
       </div>
     </div>
