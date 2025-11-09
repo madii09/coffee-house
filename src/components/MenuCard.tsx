@@ -9,11 +9,10 @@ interface MenuCardProps {
 
 const MenuCard: React.FC<MenuCardProps> = ({ item, onClick, isLoggedIn }) => {
   const price = Number(item.price ?? 0);
-  const discount = item.discountPrice ? Number(item.discountPrice) : null;
+  const discountPrice = item.discountPrice ? Number(item.discountPrice) : null;
 
-  const displayPrice =
-    isLoggedIn && discount && discount < price ? discount : price;
-  const showOriginalPrice = isLoggedIn && discount && discount < price;
+  const showDiscount =
+    isLoggedIn && discountPrice !== null && discountPrice < price;
 
   return (
     <div className='menu-card' onClick={() => onClick(item)}>
@@ -22,19 +21,17 @@ const MenuCard: React.FC<MenuCardProps> = ({ item, onClick, isLoggedIn }) => {
         <h3>{item.name}</h3>
         <p>{item.description}</p>
         <div className='prices'>
-          {showOriginalPrice && (
-            <span className='original-price line-through text-gray-500'>
+          {showDiscount && (
+            <span className='original-price line-through text-gray-500 mr-2'>
               ${price.toFixed(2)}
             </span>
           )}
           <span
-            className={`price ${
-              showOriginalPrice
-                ? 'discount-price text-red-600 font-semibold'
-                : 'font-semibold'
+            className={`price font-semibold ${
+              showDiscount ? 'text-red-600' : ''
             }`}
           >
-            ${displayPrice.toFixed(2)}
+            ${showDiscount ? discountPrice!.toFixed(2) : price.toFixed(2)}
           </span>
         </div>
       </div>

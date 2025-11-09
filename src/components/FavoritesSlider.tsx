@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import type { CoffeeItem } from '../types/products';
 import { fetchFavorites, type FavoritesResponse } from '../services/api';
 import imagesData from '../data/images.json';
+import { API_BASE } from '../services/api';
 
 type CoffeeItemWithImage = CoffeeItem & { image: string };
 
@@ -15,13 +16,27 @@ const FavoritesSlider: React.FC = () => {
   const [current, setCurrent] = useState(0);
   const intervalRef = useRef<number | null>(null);
 
-  const isUserLoggedIn = () => Boolean(localStorage.getItem('access_token'));
+  const isUserLoggedIn = () => {
+    const user = localStorage.getItem('currentUser');
+    return !!(user && JSON.parse(user).token);
+  };
 
   useEffect(() => {
     async function loadFavorites() {
       try {
-        const response: FavoritesResponse = await fetchFavorites();
-        const favorites: CoffeeItem[] = response.data;
+        const user = localStorage.getItem('currentUser');
+        const token = user ? JSON.parse(user).token : null;
+
+        let favorites: CoffeeItem[] = [];
+
+        if (token) {
+          const response: FavoritesResponse = await fetchFavorites();
+          favorites = response.data;
+        } else {
+          const response = await fetch(`${API_BASE}/products`);
+          const data = await response.json();
+          favorites = data.data.slice(0, 3);
+        }
 
         const mappedSlides: CoffeeItemWithImage[] = favorites
           .filter((item) => imageMap[item.name])
@@ -29,9 +44,7 @@ const FavoritesSlider: React.FC = () => {
           .slice(0, 3);
 
         setSlides(mappedSlides);
-      } catch (error) {
-        console.error(error);
-      }
+      } catch (error) {}
     }
 
     loadFavorites();
@@ -110,7 +123,7 @@ const FavoritesSlider: React.FC = () => {
               </span>
             </>
           ) : (
-            `$${Number(price).toFixed(2)}`
+            <span className='normal-price'>${Number(price).toFixed(2)}</span>
           )}
         </div>
       </div>

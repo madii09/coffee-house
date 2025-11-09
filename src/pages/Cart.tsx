@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { useCart } from '../context/useCart';
-import { showTopNotification } from '../utils/cartHelpers';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 import images from '../data/images.json';
-
-const API_BASE = 'https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com';
+import { API_BASE } from '../services/api';
+import toast from 'react-hot-toast';
 
 const Cart: React.FC = () => {
   const { cart, removeItem, clearCart, totalPrice } = useCart();
@@ -16,8 +15,9 @@ const Cart: React.FC = () => {
   const confirmOrder = async () => {
     setOrderStatus('Placing order...');
     try {
-      const token = localStorage.getItem('access_token');
-      if (!token) throw new Error('Not logged in');
+      if (!currentUser?.token) throw new Error('Not logged in');
+
+      const token = currentUser.token;
 
       const payload = {
         items: cart.map((it) => ({
@@ -26,7 +26,10 @@ const Cart: React.FC = () => {
           additives: it.extras.map((e) => e.name),
           quantity: it.quantity,
         })),
-        totalPrice: cart.reduce((sum, it) => sum + it.totalPrice, 0),
+        totalPrice: cart.reduce(
+          (sum, it) => sum + (it.discountPrice ?? it.basePrice),
+          0
+        ),
       };
 
       const res = await fetch(`${API_BASE}/orders/confirm`, {
@@ -40,18 +43,29 @@ const Cart: React.FC = () => {
 
       const data = await res.json();
 
-      if (!res.ok) throw new Error(data.message || 'Order failed');
+      if (!res.ok)
+        throw new Error(
+          data?.data?.message || 'Order failed, please try again!'
+        );
 
       clearCart();
-      showTopNotification(
-        'Thank you for your order! Our manager will contact you shortly'
+      toast.success(
+        'Thank you for your order! Our manager will contact you shortly',
+        {
+          duration: 4000,
+          position: 'top-center',
+        }
       );
-      setOrderStatus(
-        `Order placed successfully! Order ID: ${data.data?.orderId || '-'}`
-      );
-    } catch (err) {
+      setOrderStatus(`Order confirmed! Order ID: ${data.data?.orderId || '-'}`);
+    } catch (err: unknown) {
       console.error('Order error', err);
-      showTopNotification('Something went wrong. Please, try again');
+
+      let errorMessage = 'Something went wrong. Please, try again';
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+
+      toast.error(errorMessage, { duration: 4000, position: 'top-center' });
       setOrderStatus('Order failed. Please try again.');
     }
   };

@@ -2,8 +2,10 @@ import '../styles/main.scss';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import FavoritesSlider from '../components/FavoritesSlider';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+  const navigate = useNavigate();
   return (
     <>
       <Header />
@@ -33,7 +35,7 @@ const Home = () => {
                 and those seeking a warm and inviting space to enjoy their
                 favorite beverage.
               </p>
-              <button className='btn' data-menu-link>
+              <button className='btn' onClick={() => navigate('/menu')}>
                 Menu
               </button>
             </div>

@@ -8,7 +8,7 @@ import MenuCard from '../components/MenuCard';
 import { fetchMenuItems, fetchMenuItemById } from '../services/api';
 import type { MenuItem } from '../types/types';
 import { useAuth } from '../context/AuthContext';
-import { FiChevronDown } from 'react-icons/fi'; // <- import load icon
+import { FiChevronDown } from 'react-icons/fi';
 
 const Menu = () => {
   const { currentUser } = useAuth();
@@ -18,9 +18,10 @@ const Menu = () => {
     'coffee'
   );
   const [items, setItems] = useState<MenuItem[]>([]);
-  const [visibleCount, setVisibleCount] = useState(8); // <- show 8 items initially
+  const [visibleCount, setVisibleCount] = useState(8);
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
 
   useEffect(() => {
@@ -28,8 +29,14 @@ const Menu = () => {
       try {
         const data = await fetchMenuItems();
         setItems(data);
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Failed to fetch menu items', err);
+
+        if (err instanceof Response && err.status === 500) {
+          setError('Something went wrong. Please, refresh the page');
+        } else {
+          setError('Failed to load menu items');
+        }
       } finally {
         setLoading(false);
       }
@@ -72,7 +79,7 @@ const Menu = () => {
                 className={`menu-btn ${category === cat ? 'active' : ''}`}
                 onClick={() => {
                   setCategory(cat as 'coffee' | 'tea' | 'dessert');
-                  setVisibleCount(8); // reset visible count when switching category
+                  setVisibleCount(8);
                 }}
               >
                 <img src={`/assets/icons/${cat}.png`} alt={cat} />
@@ -83,6 +90,8 @@ const Menu = () => {
 
           {loading ? (
             <p>Loading menu...</p>
+          ) : error ? (
+            <p className='error-message'>{error}</p>
           ) : (
             <div id='menu-items' className='menu-items'>
               {visibleItems.map((item) => (

@@ -12,7 +12,7 @@ const App = () => {
   return (
     <AuthProvider>
       <CartProvider>
-        <Toaster />
+        <Toaster position='top-center' reverseOrder={false} />
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/auth' element={<AuthPage />} />

@@ -185,24 +185,26 @@ const Modal: React.FC<ModalProps> = ({ item, onClose }) => {
 
             <div className='price-section'>
               <span>Total: </span>
-              {currentUser && totalPrice < totalPriceOriginal ? (
-                <>
-                  <span
-                    style={{
-                      textDecoration: 'line-through',
-                      marginRight: '0.5rem',
-                      color: '#888',
-                    }}
-                  >
-                    ${totalPriceOriginal.toFixed(2)}
-                  </span>
-                  <span style={{ color: '#403F3D', fontWeight: 600 }}>
-                    ${totalPrice.toFixed(2)}
-                  </span>
-                </>
-              ) : (
-                <span>${totalPrice.toFixed(2)}</span>
-              )}
+              <div>
+                {currentUser && totalPrice < totalPriceOriginal ? (
+                  <>
+                    <span
+                      style={{
+                        textDecoration: 'line-through',
+                        marginRight: '0.5rem',
+                        color: '#888',
+                      }}
+                    >
+                      ${totalPriceOriginal.toFixed(2)}
+                    </span>
+                    <span style={{ color: '#403F3D', fontWeight: 600 }}>
+                      ${totalPrice.toFixed(2)}
+                    </span>
+                  </>
+                ) : (
+                  <span>${totalPrice.toFixed(2)}</span>
+                )}
+              </div>
             </div>
 
             <button className='modal-add-to-cart' onClick={handleAddToCart}>
