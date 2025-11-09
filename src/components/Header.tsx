@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import '../styles/_header.scss';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/useCart';
+import { FiLogOut } from 'react-icons/fi'; // <- import logout icon
 
 const Header = () => {
   const { currentUser, logout } = useAuth();
@@ -55,11 +56,11 @@ const Header = () => {
           </Link>
 
           <button
-            className='header__auth-btn'
+            className='auth-icon'
             onClick={handleAuthClick}
             title={currentUser ? 'Logout' : 'Sign In / Sign Up'}
           >
-            {currentUser ? 'Logout' : 'Sign In / Sign Up'}
+            {currentUser ? <FiLogOut size={20} /> : 'Sign In / Sign Up'}
           </button>
         </div>
 

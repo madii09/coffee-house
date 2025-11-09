@@ -8,6 +8,7 @@ import MenuCard from '../components/MenuCard';
 import { fetchMenuItems, fetchMenuItemById } from '../services/api';
 import type { MenuItem } from '../types/types';
 import { useAuth } from '../context/AuthContext';
+import { FiChevronDown } from 'react-icons/fi'; // <- import load icon
 
 const Menu = () => {
   const { currentUser } = useAuth();
@@ -17,7 +18,7 @@ const Menu = () => {
     'coffee'
   );
   const [items, setItems] = useState<MenuItem[]>([]);
-  const [visibleCount, setVisibleCount] = useState(4);
+  const [visibleCount, setVisibleCount] = useState(8); // <- show 8 items initially
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [modalLoading, setModalLoading] = useState(false);
@@ -71,7 +72,7 @@ const Menu = () => {
                 className={`menu-btn ${category === cat ? 'active' : ''}`}
                 onClick={() => {
                   setCategory(cat as 'coffee' | 'tea' | 'dessert');
-                  setVisibleCount(4);
+                  setVisibleCount(8); // reset visible count when switching category
                 }}
               >
                 <img src={`/assets/icons/${cat}.png`} alt={cat} />
@@ -99,9 +100,10 @@ const Menu = () => {
             <button
               id='loadMoreBtn'
               className='load-more-btn'
-              onClick={() => setVisibleCount((prev) => prev + 4)}
+              onClick={() => setVisibleCount((prev) => prev + 8)}
+              aria-label='Load more items'
             >
-              Load More
+              <FiChevronDown size={24} />
             </button>
           )}
         </section>
