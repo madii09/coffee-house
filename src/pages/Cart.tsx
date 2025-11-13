@@ -1,16 +1,20 @@
 import { useState } from 'react';
-import { useCart } from '../context/useCart';
+import { useCartStore } from '../zustand/useCartStore';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../zustand/useAuthStore';
 import images from '../data/images.json';
 import { API_BASE } from '../services/api';
 import toast from 'react-hot-toast';
 
 const Cart: React.FC = () => {
-  const { cart, removeItem, clearCart, totalPrice } = useCart();
+  const cart = useCartStore((state) => state.cart);
+  const removeItem = useCartStore((state) => state.removeItem);
+  const clearCart = useCartStore((state) => state.clearCart);
+  const totalPrice = useCartStore((state) => state.totalPrice);
+
+  const currentUser = useAuthStore((state) => state.currentUser);
   const [orderStatus, setOrderStatus] = useState<string>('');
-  const { currentUser } = useAuth();
 
   const confirmOrder = async () => {
     setOrderStatus('Placing order...');
@@ -23,11 +27,11 @@ const Cart: React.FC = () => {
         items: cart.map((it) => ({
           productId: Number(it.id),
           size: it.size.label,
-          additives: it.extras.map((e) => e.name),
+          additives: it.extras?.map((e) => e.name) ?? [],
           quantity: it.quantity,
         })),
         totalPrice: cart.reduce(
-          (sum, it) => sum + (it.discountPrice ?? it.basePrice),
+          (sum, it) => sum + (it.discountPrice ?? it.basePrice ?? 0),
           0
         ),
       };
@@ -117,7 +121,7 @@ const Cart: React.FC = () => {
                     <div className='ci-name'>{c.name}</div>
                     <div className='ci-size'>
                       Size: {c.size.label}
-                      {c.extras.length
+                      {c.extras?.length
                         ? ` | Extras: ${c.extras.map((x) => x.name).join(', ')}`
                         : ''}
                     </div>
@@ -134,14 +138,14 @@ const Cart: React.FC = () => {
                               marginRight: '0.5rem',
                             }}
                           >
-                            ${c.basePrice.toFixed(2)}
+                            ${c.basePrice?.toFixed(2)}
                           </span>
                           <span style={{ color: '#403F3D', fontWeight: 600 }}>
                             ${c.discountPrice.toFixed(2)}
                           </span>
                         </>
                       ) : (
-                        `$${c.basePrice.toFixed(2)}`
+                        `$${c.basePrice?.toFixed(2)}`
                       )}
                     </div>
                   </div>
@@ -163,14 +167,19 @@ const Cart: React.FC = () => {
                     >
                       $
                       {cart
-                        .reduce((sum, it) => sum + it.basePrice, 0)
+                        .reduce(
+                          (sum, it) =>
+                            sum + (it.discountPrice ?? it.basePrice ?? 0),
+                          0
+                        )
                         .toFixed(2)}
                     </span>
                     <span style={{ color: '#403F3D', fontWeight: 600 }}>
                       $
                       {cart
                         .reduce(
-                          (sum, it) => sum + (it.discountPrice ?? it.basePrice),
+                          (sum, it) =>
+                            sum + (it.discountPrice ?? it.basePrice ?? 0),
                           0
                         )
                         .toFixed(2)}

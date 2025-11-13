@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../zustand/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 
 export const LoginForm = () => {
-  const { login } = useAuth();
+  const login = useAuthStore((state) => state.login);
   const navigate = useNavigate();
   const [loginInput, setLoginInput] = useState('');
   const [password, setPassword] = useState('');

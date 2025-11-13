@@ -1,5 +1,4 @@
 import '../styles/_footer.scss';
-
 const Footer = () => {
   return (
     <footer id='contacts' className='footer container'>

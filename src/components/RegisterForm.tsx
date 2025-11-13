@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../zustand/useAuthStore';
 import { useNavigate } from 'react-router-dom';
 
 export const RegisterForm = () => {
-  const { register } = useAuth();
+  const register = useAuthStore((state) => state.register);
   const navigate = useNavigate();
 
   const [login, setLogin] = useState('');

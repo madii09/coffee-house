@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/_menu.scss';
-import type { MenuItem, Size, Additive, CartItem } from '../types/types';
+import type { MenuItem } from '../types/types';
 import images from '../data/images.json';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useCart } from '../context/useCart';
+import { useAuthStore } from '../zustand/useAuthStore';
+import { useCartStore } from '../zustand/useCartStore';
+import type { CartItem } from '../zustand/useCartStore';
 
 interface ModalProps {
   item: MenuItem;
@@ -20,9 +21,10 @@ const Modal: React.FC<ModalProps> = ({ item, onClose }) => {
   const [imageSrc, setImageSrc] = useState<string>('/placeholder.png');
   const [totalPriceOriginal, setTotalPriceOriginal] = useState<number>(0);
 
-  const { currentUser } = useAuth();
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const addItem = useCartStore((state) => state.addItem);
+
   const navigate = useNavigate();
-  const { addItem } = useCart();
 
   useEffect(() => {
     const matched = images.find(
@@ -44,7 +46,6 @@ const Modal: React.FC<ModalProps> = ({ item, onClose }) => {
 
   useEffect(() => {
     if (!selectedSize || !item.sizes) return;
-    if (currentUser === undefined) return;
 
     const sizeData = item.sizes[selectedSize];
     if (!sizeData) return;
@@ -112,16 +113,15 @@ const Modal: React.FC<ModalProps> = ({ item, onClose }) => {
         : Number(item.price ?? 0);
 
     const extrasPrice = extras.reduce((sum, add) => sum + add.price, 0);
-    const basePrice = sizePrice + extrasPrice;
 
     const cartItem: CartItem = {
-      id: item.id,
+      id: Number(item.id),
       name: item.name,
       image: imageSrc,
       size: {
         key: selectedSize,
         label: selectedSize,
-        addPrice: Number(item.sizes?.[selectedSize]?.price ?? 0),
+        price: sizePrice,
       },
       extras,
       quantity: 1,

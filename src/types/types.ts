@@ -43,7 +43,7 @@ export type CartExtra = {
 };
 
 export interface CartItem {
-  id?: string | number;
+  id: number;
   name: string;
   image?: string;
   basePrice: number;

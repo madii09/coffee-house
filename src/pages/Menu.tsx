@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import '../styles/_menu.scss';
 import Modal from '../components/Modal';
 import Footer from '../components/Footer';
@@ -7,12 +6,11 @@ import Header from '../components/Header';
 import MenuCard from '../components/MenuCard';
 import { fetchMenuItems, fetchMenuItemById } from '../services/api';
 import type { MenuItem } from '../types/types';
-import { useAuth } from '../context/AuthContext';
+import { useAuthStore } from '../zustand/useAuthStore';
 import { FiChevronDown } from 'react-icons/fi';
 
 const Menu = () => {
-  const { currentUser } = useAuth();
-  const navigate = useNavigate();
+  const currentUser = useAuthStore((state) => state.currentUser);
 
   const [category, setCategory] = useState<'coffee' | 'tea' | 'dessert'>(
     'coffee'
