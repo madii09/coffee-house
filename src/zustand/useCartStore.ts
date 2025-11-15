@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { useAuthStore } from './useAuthStore';
 
 export interface Extra {
   name: string;
@@ -32,8 +31,6 @@ interface CartState {
   addItem: (item: CartItem) => void;
   removeItem: (idx: number) => void;
   clearCart: () => void;
-  totalItems: number;
-  totalPrice: number;
 }
 
 export const useCartStore = create<CartState>()(
@@ -57,14 +54,12 @@ export const useCartStore = create<CartState>()(
             totalPrice: existing.totalPrice + item.totalPrice,
             discountPrice: item.discountPrice ?? existing.discountPrice,
           };
-
-          set({
-            cart: [
-              ...get().cart.slice(0, existingIndex),
-              updatedItem,
-              ...get().cart.slice(existingIndex + 1),
-            ],
-          });
+          const newCart = [
+            ...get().cart.slice(0, existingIndex),
+            updatedItem,
+            ...get().cart.slice(existingIndex + 1),
+          ];
+          set({ cart: newCart });
         } else {
           set({ cart: [...get().cart, item] });
         }
@@ -77,33 +72,17 @@ export const useCartStore = create<CartState>()(
       },
 
       clearCart: () => set({ cart: [] }),
-
-      get totalItems() {
-        return get().cart.reduce((sum, it) => sum + it.quantity, 0);
-      },
-
-      get totalPrice() {
-        return get().cart.reduce(
-          (sum, it) => sum + (it.discountPrice ?? it.totalPrice),
-          0
-        );
-      },
     }),
     {
       name: 'cart-storage',
-      merge: (persisted, current) => {
-        const persistedState = persisted as Partial<CartState> | undefined;
-
-        const { currentUser } = useAuthStore.getState();
-        if (currentUser) {
-          const userKey = `cart_user_${currentUser.id}`;
-          const saved = localStorage.getItem(userKey);
-          if (saved) {
-            return { ...current, cart: JSON.parse(saved) };
-          }
-        }
-
-        return { ...current, ...(persistedState ?? {}) };
+      storage: {
+        getItem: (name) => {
+          const item = localStorage.getItem(name);
+          return item ? Promise.resolve(JSON.parse(item)) : Promise.resolve(null);
+        },
+        setItem: (name, value) =>
+          Promise.resolve(localStorage.setItem(name, JSON.stringify(value))),
+        removeItem: (name) => Promise.resolve(localStorage.removeItem(name)),
       },
     }
   )

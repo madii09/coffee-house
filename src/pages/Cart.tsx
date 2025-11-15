@@ -6,15 +6,19 @@ import { useAuthStore } from '../zustand/useAuthStore';
 import images from '../data/images.json';
 import { API_BASE } from '../services/api';
 import toast from 'react-hot-toast';
+import { useOrdersStore } from '../zustand/useOrdersStore';
 
 const Cart: React.FC = () => {
   const cart = useCartStore((state) => state.cart);
   const removeItem = useCartStore((state) => state.removeItem);
   const clearCart = useCartStore((state) => state.clearCart);
-  const totalPrice = useCartStore((state) => state.totalPrice);
+  const totalPrice = useCartStore((state) =>
+    state.cart.reduce((sum, it) => sum + (it.discountPrice ?? it.totalPrice), 0)
+  );
 
   const currentUser = useAuthStore((state) => state.currentUser);
   const [orderStatus, setOrderStatus] = useState<string>('');
+  const addOrder = useOrdersStore((state) => state.addOrder);
 
   const confirmOrder = async () => {
     setOrderStatus('Placing order...');
@@ -52,15 +56,30 @@ const Cart: React.FC = () => {
           data?.data?.message || 'Order failed, please try again!'
         );
 
+      const orderData = {
+        orderId: data.data?.orderId || new Date().getTime().toString(),
+        items: cart.map((it) => ({
+          productId: Number(it.id),
+          name: it.name,
+          size: it.size.label,
+          additives: it.extras?.map((e) => e.name) ?? [],
+          quantity: it.quantity,
+          price: it.discountPrice ?? it.basePrice ?? 0,
+        })),
+        totalPrice: cart.reduce(
+          (sum, it) => sum + (it.discountPrice ?? it.basePrice ?? 0),
+          0
+        ),
+        createdAt: new Date().toISOString(),
+      };
+      addOrder(orderData);
+
       clearCart();
+
       toast.success(
         'Thank you for your order! Our manager will contact you shortly',
-        {
-          duration: 4000,
-          position: 'top-center',
-        }
+        { duration: 4000, position: 'top-center' }
       );
-      setOrderStatus(`Order confirmed! Order ID: ${data.data?.orderId || '-'}`);
     } catch (err: unknown) {
       console.error('Order error', err);
 
@@ -195,9 +214,15 @@ const Cart: React.FC = () => {
                   <div className='delivery-address'>
                     Delivery address:{' '}
                     <strong>
-                      {localStorage.getItem('delivery_address') || 'No address'}
+                      {currentUser
+                        ? `${currentUser.city || ''} ${
+                            currentUser.street || ''
+                          } ${currentUser.houseNumber || ''}`.trim() ||
+                          'No address'
+                        : 'No address'}
                     </strong>
                   </div>
+
                   <button className='confirm-order-btn' onClick={confirmOrder}>
                     Confirm Order
                   </button>

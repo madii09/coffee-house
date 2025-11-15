@@ -27,7 +27,6 @@ interface AuthState {
 export const useAuthStore = create<AuthState>((set) => ({
   currentUser: JSON.parse(localStorage.getItem('currentUser') || 'null'),
 
-  // register user
   register: async (user) => {
     try {
       const res = await fetch(
@@ -63,7 +62,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  // login user
   login: async (login, password) => {
     try {
       const res = await fetch(
@@ -93,7 +91,6 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  // logout user
   logout: () => {
     localStorage.removeItem('currentUser');
     set({ currentUser: null });
