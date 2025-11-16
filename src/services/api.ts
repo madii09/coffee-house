@@ -1,3 +1,4 @@
+import { auth } from "../firebase/firebaseConfig";
 import type { CoffeeItem } from "../types/products";
 import type { Additive, MenuItem, Size } from "../types/types";
 import images from "../data/images.json";
@@ -8,36 +9,33 @@ export type FavoritesResponse = {
   data: CoffeeItem[];
 };
 
-export async function fetchFavorites(): Promise<FavoritesResponse> {
+export async function fetchFavorites(token?: string): Promise<FavoritesResponse> {
   try {
-    const savedUser = localStorage.getItem('currentUser');
-    const token = savedUser ? JSON.parse(savedUser).token : null;
-
     if (!token) {
-      console.warn('No user token found — skipping favorites fetch');
+      console.warn("No logged-in user — skipping favorites fetch");
       return { data: [] };
     }
 
     const res = await fetch(`${API_BASE}/products/favorites`, {
-      method: 'GET',
+      method: "GET",
       headers: {
         Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      cache: 'no-store',
+      cache: "no-store",
     });
 
     if (!res.ok) {
       const text = await res.text();
-      throw new Error(`Failed to fetch favorites: ${res.status}`);
+      throw new Error(`Failed to fetch favorites: ${res.status} ${text}`);
     }
 
     return res.json();
   } catch (error) {
-    throw error;
+    console.error("Error fetching favorites:", error);
+    return { data: [] };
   }
 }
-
 
 
 export async function fetchMenuItems(): Promise<MenuItem[]> {

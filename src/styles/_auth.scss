@@ -83,6 +83,21 @@
       }
     }
   }
+  .loader {
+    width: 18px;
+    height: 18px;
+    border: 3px solid #fff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 }
 
 @media (max-width: 480px) {

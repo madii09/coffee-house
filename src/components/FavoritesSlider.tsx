@@ -1,8 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
 import type { CoffeeItem } from '../types/products';
-import { fetchFavorites, type FavoritesResponse } from '../services/api';
+import {
+  fetchFavorites,
+  type FavoritesResponse,
+  API_BASE,
+} from '../services/api';
 import imagesData from '../data/images.json';
-import { API_BASE } from '../services/api';
+import { useAuthStore, type User } from '../zustand/useAuthStore';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase/firebaseConfig';
+import { getUserProfile } from '../firebase/firestore';
 
 type CoffeeItemWithImage = CoffeeItem & { image: string };
 
@@ -16,38 +23,47 @@ const FavoritesSlider: React.FC = () => {
   const [current, setCurrent] = useState(0);
   const intervalRef = useRef<number | null>(null);
 
-  const isUserLoggedIn = () => {
-    const user = localStorage.getItem('currentUser');
-    return !!(user && JSON.parse(user).token);
-  };
+  const currentUser = useAuthStore((state) => state.currentUser);
+  const loggedIn = !!currentUser;
 
   useEffect(() => {
-    async function loadFavorites() {
-      try {
-        const user = localStorage.getItem('currentUser');
-        const token = user ? JSON.parse(user).token : null;
-
-        let favorites: CoffeeItem[] = [];
-
-        if (token) {
-          const response: FavoritesResponse = await fetchFavorites();
-          favorites = response.data;
-        } else {
-          const response = await fetch(`${API_BASE}/products`);
-          const data = await response.json();
-          favorites = data.data.slice(0, 3);
-        }
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const token = await user.getIdToken();
+        const response: FavoritesResponse = await fetchFavorites(token);
+        const favorites = response.data;
 
         const mappedSlides: CoffeeItemWithImage[] = favorites
-          .filter((item) => imageMap[item.name])
-          .map((item) => ({ ...item, image: imageMap[item.name] }))
+          .filter((item: CoffeeItem) => imageMap[item.name])
+          .map((item: CoffeeItem) => ({ ...item, image: imageMap[item.name] }))
           .slice(0, 3);
 
         setSlides(mappedSlides);
-      } catch (error) {}
-    }
 
-    loadFavorites();
+        // update Zustand store safely
+        const profile = await getUserProfile(user.uid);
+        if (profile && profile.login) {
+          useAuthStore.getState().setUser(profile as User);
+        } else {
+          useAuthStore.getState().setUser(null);
+        }
+      } else {
+        // not logged in — show default products
+        const res = await fetch(`${API_BASE}/products`);
+        const data = await res.json();
+        const favorites = data.data.slice(0, 3);
+
+        const mappedSlides: CoffeeItemWithImage[] = favorites
+          .filter((item: CoffeeItem) => imageMap[item.name])
+          .map((item: CoffeeItem) => ({ ...item, image: imageMap[item.name] }))
+          .slice(0, 3);
+
+        setSlides(mappedSlides);
+        useAuthStore.getState().setUser(null);
+      }
+    });
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -69,7 +85,6 @@ const FavoritesSlider: React.FC = () => {
   if (slides.length === 0) return <div>Loading...</div>;
 
   const { name, description, price, discountPrice } = slides[current];
-  const loggedIn = isUserLoggedIn();
 
   return (
     <>
@@ -109,6 +124,7 @@ const FavoritesSlider: React.FC = () => {
           &gt;
         </button>
       </div>
+
       <div className='text'>
         <span className='name'>{name}</span>
         <p className='desc'>{description}</p>

@@ -6,6 +6,7 @@ import './styles/main.scss';
 import { Toaster } from 'react-hot-toast';
 import { AuthPage } from './pages/AuthPage';
 import Orders from './pages/Order';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 const App = () => {
   return (
@@ -16,7 +17,14 @@ const App = () => {
         <Route path='/auth' element={<AuthPage />} />
         <Route path='/menu' element={<Menu />} />
         <Route path='/cart' element={<Cart />} />
-        <Route path='/orders' element={<Orders />} />
+        <Route
+          path='/orders'
+          element={
+            <ProtectedRoute>
+              <Orders />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </>
   );

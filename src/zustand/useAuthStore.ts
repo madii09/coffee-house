@@ -1,100 +1,77 @@
+import { create } from "zustand";
+import { registerUser, loginUser, logoutUser } from "../firebase/auth";
+import { getUserProfile } from "../firebase/firestore";
 
-import { create } from 'zustand';
-
-interface User {
+export interface User {
+  uid: string;
   login: string;
-  password?: string;
-  confirmPassword: string;
   city?: string;
   street?: string;
   houseNumber?: number;
   paymentMethod?: string;
-  id: number;
-  createdAt?: string;
-  token?: string;
 }
 
 interface AuthState {
   currentUser: User | null;
-  register: (
-    user: Partial<User> & { confirmPassword: string }
-  ) => Promise<boolean | 'exists'>;
+  register: (user: any) => Promise<boolean | "exists">;
   login: (login: string, password: string) => Promise<boolean>;
   logout: () => void;
   setUser: (user: User | null) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  currentUser: JSON.parse(localStorage.getItem('currentUser') || 'null'),
+  currentUser: JSON.parse(localStorage.getItem("currentUser") || "null"),
 
   register: async (user) => {
-    try {
-      const res = await fetch(
-        'https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com/auth/register',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(user),
-        }
-      );
+    const result = await registerUser(user);
 
-      if (res.status === 409) {
-        console.warn('User already exists');
-        return 'exists';
-      }
+    if (result === "exists") return "exists";
+    if (!result) return false;
 
-      const data = await res.json();
+    const profileData = await getUserProfile(result.uid);
+    if (!profileData || !profileData.login) return false;
 
-      if (res.ok) {
-        const userWithToken = {
-          ...data.data.user,
-          token: data.data.access_token,
-        };
-        localStorage.setItem('currentUser', JSON.stringify(userWithToken));
-        set({ currentUser: userWithToken });
-        return true;
-      }
+    const profile: User = {
+      uid: result.uid,
+      login: profileData.login,
+      city: profileData.city,
+      street: profileData.street,
+      houseNumber: profileData.houseNumber,
+      paymentMethod: profileData.paymentMethod,
+    };
 
-      return false;
-    } catch (err) {
-      console.error(err);
-      return false;
-    }
+    localStorage.setItem("currentUser", JSON.stringify(profile));
+    set({ currentUser: profile });
+
+    return true;
   },
 
   login: async (login, password) => {
-    try {
-      const res = await fetch(
-        'https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com/auth/login',
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ login, password }),
-        }
-      );
+    const result = await loginUser(login, password);
+    if (!result) return false;
 
-      const data = await res.json();
+    const profileData = await getUserProfile(result.uid);
+    if (!profileData || !profileData.login) return false;
 
-      if (res.ok) {
-        const userWithToken = {
-          ...data.data.user,
-          token: data.data.access_token,
-        };
-        localStorage.setItem('currentUser', JSON.stringify(userWithToken));
-        set({ currentUser: userWithToken });
-        return true;
-      }
-      return false;
-    } catch (err) {
-      console.error(err);
-      return false;
-    }
+    const profile: User = {
+      uid: result.uid,
+      login: profileData.login,
+      city: profileData.city,
+      street: profileData.street,
+      houseNumber: profileData.houseNumber,
+      paymentMethod: profileData.paymentMethod,
+    };
+
+    localStorage.setItem("currentUser", JSON.stringify(profile));
+    set({ currentUser: profile });
+
+    return true;
   },
 
   logout: () => {
-    localStorage.removeItem('currentUser');
+    logoutUser();
+    localStorage.removeItem("currentUser");
     set({ currentUser: null });
-    window.location.reload();
   },
 
   setUser: (user) => set({ currentUser: user }),

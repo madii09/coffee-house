@@ -1,22 +1,31 @@
 import { useOrdersStore } from '../zustand/useOrdersStore';
+import { useAuthStore } from '../zustand/useAuthStore';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import '../styles/_orders.scss';
 
 const Orders: React.FC = () => {
+  const currentUser = useAuthStore((state) => state.currentUser);
   const orders = useOrdersStore((state) => state.orders);
   const deleteOrder = useOrdersStore((state) => state.deleteOrder);
+
+  const userOrders = orders
+    .filter((order) => order.userId === currentUser?.uid)
+    .sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
 
   return (
     <>
       <Header />
       <main className='container orders'>
         <h1 className='page-title'>Order History</h1>
-        {orders.length === 0 ? (
+        {userOrders.length === 0 ? (
           <p>You have no previous orders.</p>
         ) : (
           <div className='orders-list'>
-            {orders.map((order) => (
+            {userOrders.map((order) => (
               <div className='order-card' key={order.orderId}>
                 <div className='order-header'>
                   <div>
@@ -41,12 +50,14 @@ const Orders: React.FC = () => {
                         <span>| Extras: {item.additives.join(', ')}</span>
                       )}
                       <span> | Qty: {item.quantity}</span> |{' '}
-                      <span>Price: ${item.price.toFixed(2)}</span>
+                      <span>
+                        Price: ${(Number(item.price) ?? 0).toFixed(2)}
+                      </span>
                     </div>
                   ))}
                 </div>
                 <div className='order-total'>
-                  <p>Total: ${order.totalPrice.toFixed(2)}</p>
+                  <p>Total: ${(Number(order.totalPrice) ?? 0).toFixed(2)}</p>
                 </div>
               </div>
             ))}

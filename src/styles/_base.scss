@@ -34,6 +34,27 @@ body {
   background-color: #e1d4c9;
 }
 
+.error-boundary {
+  padding: 2rem;
+  text-align: center;
+  color: #ff4d4f;
+  font-size: 1.2rem;
+  background-color: #fff4f4;
+  border: 1px solid #ffccc7;
+  border-radius: 8px;
+  margin: 2rem auto;
+  max-width: 500px;
+
+  h2 {
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+  }
+
+  p {
+    font-size: 1rem;
+  }
+}
+
 .container {
   max-width: 1440px;
   padding: 0 40px;

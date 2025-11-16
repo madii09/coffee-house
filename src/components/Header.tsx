@@ -30,10 +30,9 @@ const Header = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('delivery_address');
     setProfileMenuOpen(false);
-    navigate('/'); // redirect after logout
+    navigate('/');
   };
 
-  // Close profile menu if clicked outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

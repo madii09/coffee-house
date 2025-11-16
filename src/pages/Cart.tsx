@@ -7,25 +7,53 @@ import images from '../data/images.json';
 import { API_BASE } from '../services/api';
 import toast from 'react-hot-toast';
 import { useOrdersStore } from '../zustand/useOrdersStore';
+import { getAuth } from 'firebase/auth';
 
 const Cart: React.FC = () => {
   const cart = useCartStore((state) => state.cart);
   const removeItem = useCartStore((state) => state.removeItem);
   const clearCart = useCartStore((state) => state.clearCart);
   const totalPrice = useCartStore((state) =>
-    state.cart.reduce((sum, it) => sum + (it.discountPrice ?? it.totalPrice), 0)
+    state.cart.reduce(
+      (sum, it) => sum + Number(it.discountPrice ?? it.basePrice ?? 0),
+      0
+    )
   );
 
   const currentUser = useAuthStore((state) => state.currentUser);
   const [orderStatus, setOrderStatus] = useState<string>('');
   const addOrder = useOrdersStore((state) => state.addOrder);
 
+  const originalTotal = cart.reduce((sum, it) => sum + (it.basePrice ?? 0), 0);
+
+  const discountedTotal = cart.reduce(
+    (sum, it) => sum + (it.discountPrice ?? it.basePrice ?? 0),
+    0
+  );
+
   const confirmOrder = async () => {
+    if (!currentUser) {
+      toast.error('Please sign in to confirm your order', {
+        duration: 4000,
+        position: 'top-center',
+      });
+      return;
+    }
     setOrderStatus('Placing order...');
     try {
-      if (!currentUser?.token) throw new Error('Not logged in');
+      const auth = getAuth();
+      const firebaseUser = auth.currentUser;
 
-      const token = currentUser.token;
+      if (!firebaseUser) {
+        toast.error('Please sign in to confirm your order', {
+          duration: 4000,
+          position: 'top-center',
+        });
+        setOrderStatus('');
+        return;
+      }
+
+      const token = await firebaseUser.getIdToken();
 
       const payload = {
         items: cart.map((it) => ({
@@ -51,13 +79,11 @@ const Cart: React.FC = () => {
 
       const data = await res.json();
 
-      if (!res.ok)
-        throw new Error(
-          data?.data?.message || 'Order failed, please try again!'
-        );
+      if (!res.ok) throw new Error(data?.data?.message || 'Order failed!');
 
       const orderData = {
         orderId: data.data?.orderId || new Date().getTime().toString(),
+        userId: currentUser!.uid,
         items: cart.map((it) => ({
           productId: Number(it.id),
           name: it.name,
@@ -72,22 +98,23 @@ const Cart: React.FC = () => {
         ),
         createdAt: new Date().toISOString(),
       };
-      addOrder(orderData);
 
+      addOrder(orderData);
       clearCart();
 
       toast.success(
         'Thank you for your order! Our manager will contact you shortly',
-        { duration: 4000, position: 'top-center' }
+        {
+          duration: 4000,
+          position: 'top-center',
+        }
       );
+
+      setOrderStatus('');
     } catch (err: unknown) {
       console.error('Order error', err);
-
-      let errorMessage = 'Something went wrong. Please, try again';
-      if (err instanceof Error) {
-        errorMessage = err.message;
-      }
-
+      const errorMessage =
+        err instanceof Error ? err.message : 'Something went wrong';
       toast.error(errorMessage, { duration: 4000, position: 'top-center' });
       setOrderStatus('Order failed. Please try again.');
     }
@@ -184,24 +211,10 @@ const Cart: React.FC = () => {
                         marginRight: '0.5rem',
                       }}
                     >
-                      $
-                      {cart
-                        .reduce(
-                          (sum, it) =>
-                            sum + (it.discountPrice ?? it.basePrice ?? 0),
-                          0
-                        )
-                        .toFixed(2)}
+                      ${originalTotal.toFixed(2)}
                     </span>
                     <span style={{ color: '#403F3D', fontWeight: 600 }}>
-                      $
-                      {cart
-                        .reduce(
-                          (sum, it) =>
-                            sum + (it.discountPrice ?? it.basePrice ?? 0),
-                          0
-                        )
-                        .toFixed(2)}
+                      ${discountedTotal.toFixed(2)}
                     </span>
                   </>
                 ) : (

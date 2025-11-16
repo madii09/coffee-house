@@ -11,6 +11,7 @@ interface OrderItem {
 
 export interface Order {
   orderId: number;
+  userId: string;
   items: OrderItem[];
   totalPrice: number;
   createdAt: string;
@@ -18,7 +19,7 @@ export interface Order {
 
 interface OrdersState {
   orders: Order[];
-  addOrder: (order: Omit<Order, 'orderId'>) => void;
+  addOrder: (order: Omit<Order, 'orderId'>) => Order;
   deleteOrder: (orderId: number) => void;
   clearOrders: () => void;
 }
@@ -28,9 +29,9 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
 
   addOrder: (order) => {
     const orders = get().orders;
-    const nextId = orders.length > 0 ? orders[orders.length - 1].orderId + 1 : 1;
+    const nextId = orders.length ? orders[orders.length - 1].orderId + 1 : 1;
 
-    const newOrder = { ...order, orderId: nextId };
+    const newOrder: Order = { ...order, orderId: nextId };
     const updatedOrders = [...orders, newOrder];
 
     localStorage.setItem('orders', JSON.stringify(updatedOrders));
@@ -38,6 +39,7 @@ export const useOrdersStore = create<OrdersState>((set, get) => ({
 
     return newOrder;
   },
+
   deleteOrder: (orderId) => {
     const updatedOrders = get().orders.filter((o) => o.orderId !== orderId);
     localStorage.setItem('orders', JSON.stringify(updatedOrders));

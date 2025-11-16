@@ -13,29 +13,46 @@ export const RegisterForm = () => {
   const [street, setStreet] = useState('');
   const [houseNumber, setHouseNumber] = useState<number | ''>('');
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | ''>('');
+
+  const [emailError, setEmailError] = useState('');
+  const [confirmError, setConfirmError] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const isStrongPassword = (value: string) => {
+    return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[\W_]).{6,}$/.test(value);
+  };
 
   const passwordError =
-    password.length > 0 && password.length < 6
-      ? 'Password must be at least 6 characters long'
+    password && !isStrongPassword(password)
+      ? 'Use letters, numbers, a symbol, and at least 6 characters'
       : '';
+
+  const handleCityChange = (value: string) => {
+    if (/^[A-Za-z\s]*$/.test(value)) setCity(value);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setEmailError('');
+    setConfirmError('');
+    setLoading(true);
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters long.');
+    if (!isStrongPassword(password)) {
+      setLoading(false);
       return;
     }
 
     if (password !== confirm) {
-      setError('Passwords do not match');
+      setConfirmError('Passwords do not match');
+      setLoading(false);
       return;
     }
 
     if (!paymentMethod) {
       setError('Please select a payment method');
+      setLoading(false);
       return;
     }
 
@@ -49,8 +66,10 @@ export const RegisterForm = () => {
       paymentMethod,
     });
 
+    setLoading(false);
+
     if (success === 'exists') {
-      setError('This login is already taken');
+      setEmailError('This login is already taken');
       return;
     }
 
@@ -64,11 +83,17 @@ export const RegisterForm = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input
-        placeholder='Login'
-        value={login}
-        onChange={(e) => setLogin(e.target.value)}
-      />
+      <div>
+        <input
+          placeholder='Email'
+          value={login}
+          onChange={(e) => {
+            setLogin(e.target.value);
+            setEmailError('');
+          }}
+        />
+        {emailError && <div style={{ color: 'red' }}>{emailError}</div>}
+      </div>
 
       <div>
         <input
@@ -80,28 +105,40 @@ export const RegisterForm = () => {
         {passwordError && <div style={{ color: 'red' }}>{passwordError}</div>}
       </div>
 
-      <input
-        type='password'
-        placeholder='Confirm Password'
-        value={confirm}
-        onChange={(e) => setConfirm(e.target.value)}
-      />
+      <div>
+        <input
+          type='password'
+          placeholder='Confirm Password'
+          value={confirm}
+          onChange={(e) => {
+            setConfirmError('');
+            setConfirm(e.target.value);
+          }}
+        />
+        {confirmError && <div style={{ color: 'red' }}>{confirmError}</div>}
+      </div>
 
       <input
         placeholder='City'
         value={city}
-        onChange={(e) => setCity(e.target.value)}
+        onChange={(e) => handleCityChange(e.target.value)}
       />
+
       <input
         placeholder='Street'
         value={street}
         onChange={(e) => setStreet(e.target.value)}
       />
+
       <input
-        type='number'
         placeholder='House Number'
         value={houseNumber}
-        onChange={(e) => setHouseNumber(Number(e.target.value))}
+        onChange={(e) => {
+          const val = e.target.value;
+          if (/^\d*$/.test(val)) {
+            setHouseNumber(val === '' ? '' : Number(val));
+          }
+        }}
       />
 
       <div>
@@ -128,7 +165,9 @@ export const RegisterForm = () => {
         </label>
       </div>
 
-      <button type='submit'>Register</button>
+      <button type='submit' disabled={loading}>
+        {loading ? <span className='loader'></span> : 'Register'}
+      </button>
 
       {error && <div style={{ color: 'red' }}>{error}</div>}
     </form>
