@@ -22,7 +22,6 @@ export const registerUser = async (
 ): Promise<User | "exists" | false> => {
   try {
     const email = `${user.login}`;
-    console.log("Registering email:", email);
 
     const res = await createUserWithEmailAndPassword(auth, email, user.password);
 
@@ -32,7 +31,6 @@ export const registerUser = async (
   } catch (err) {
     const error = err as AuthError;
     if (error.code === "auth/email-already-in-use") return "exists";
-    console.error(error);
     return false;
   }
 };
@@ -46,8 +44,6 @@ export const loginUser = async (
     const res = await signInWithEmailAndPassword(auth, email, password);
     return res.user;
   } catch (err) {
-    const error = err as AuthError;
-    console.error(error);
     return false;
   }
 };
@@ -57,7 +53,6 @@ export const logoutUser = async (): Promise<boolean> => {
     await signOut(auth);
     return true;
   } catch (err) {
-    console.error(err);
     return false;
   }
 };

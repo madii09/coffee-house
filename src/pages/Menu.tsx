@@ -24,21 +24,24 @@ const Menu = () => {
 
   useEffect(() => {
     const loadItems = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
         const data = await fetchMenuItems();
         setItems(data);
       } catch (err: unknown) {
-        console.error('Failed to fetch menu items', err);
+        let message = 'Something went wrong. Please refresh the page.';
 
-        if (err instanceof Response && err.status === 500) {
-          setError('Something went wrong. Please, refresh the page');
-        } else {
-          setError('Failed to load menu items');
+        if (err instanceof Error) {
+          message = err.message;
         }
+        setError(message);
       } finally {
         setLoading(false);
       }
     };
+
     loadItems();
   }, []);
 
@@ -51,7 +54,6 @@ const Menu = () => {
       const fullItem = await fetchMenuItemById(Number(item.id));
       setSelectedItem(fullItem);
     } catch (err) {
-      console.error('Failed to fetch item details', err);
     } finally {
       setModalLoading(false);
     }

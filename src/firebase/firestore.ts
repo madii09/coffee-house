@@ -1,7 +1,16 @@
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { db } from "./firebaseConfig";
 
-export const saveUserProfile = async (uid: string, user: any) => {
+export interface FirestoreUser {
+  login: string;
+  city?: string;
+  street?: string;
+  houseNumber?: string | number;
+  paymentMethod?: string;
+  createdAt?: string;
+}
+
+export const saveUserProfile = async (uid: string, user: FirestoreUser) => {
   const ref = doc(db, "users", uid);
   await setDoc(ref, {
     uid: uid,

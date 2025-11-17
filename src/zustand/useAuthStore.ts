@@ -10,10 +10,15 @@ export interface User {
   houseNumber?: number;
   paymentMethod?: string;
 }
+export interface RegisterData {
+  login: string;
+  password: string;
+  email?: string;
+}
 
 interface AuthState {
   currentUser: User | null;
-  register: (user: any) => Promise<boolean | "exists">;
+  register: (user: RegisterData) => Promise<boolean | "exists">;
   login: (login: string, password: string) => Promise<boolean>;
   logout: () => void;
   setUser: (user: User | null) => void;

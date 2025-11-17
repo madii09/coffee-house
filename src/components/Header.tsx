@@ -1,10 +1,11 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../styles/_header.scss';
 import { useAuthStore } from '../zustand/useAuthStore';
 import { useCartStore } from '../zustand/useCartStore';
 import { FiLogOut, FiUser, FiX } from 'react-icons/fi';
 import { GoSignIn } from 'react-icons/go';
 import { useState, useRef, useEffect } from 'react';
+import { HashLink as Link } from 'react-router-hash-link';
 
 const Header = () => {
   const currentUser = useAuthStore((state) => state.currentUser);
@@ -56,19 +57,19 @@ const Header = () => {
         <nav className='nav'>
           <ul className={`nav__list ${menuOpen ? 'active' : ''}`}>
             <li>
-              <a href='#favourites' onClick={handleNavClick}>
+              <Link smooth to='/#favourites' onClick={handleNavClick}>
                 Favourite coffee
-              </a>
+              </Link>
             </li>
             <li>
-              <a href='#about' onClick={handleNavClick}>
+              <Link smooth to='/#about' onClick={handleNavClick}>
                 About
-              </a>
+              </Link>
             </li>
             <li>
-              <a href='#mobile-app' onClick={handleNavClick}>
+              <Link smooth to='/#mobile-app' onClick={handleNavClick}>
                 Mobile app
-              </a>
+              </Link>
             </li>
             <li>
               <a href='#contacts' onClick={handleNavClick}>

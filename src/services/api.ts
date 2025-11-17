@@ -3,7 +3,7 @@ import type { CoffeeItem } from "../types/products";
 import type { Additive, MenuItem, Size } from "../types/types";
 import images from "../data/images.json";
 
-export const API_BASE = "https://6kt29kkeub.execute-api.eu-central-1.amazonaws.com";
+export const API_BASE = import.meta.env.VITE_API_BASE;
 
 export type FavoritesResponse = {
   data: CoffeeItem[];
@@ -12,7 +12,6 @@ export type FavoritesResponse = {
 export async function fetchFavorites(token?: string): Promise<FavoritesResponse> {
   try {
     if (!token) {
-      console.warn("No logged-in user — skipping favorites fetch");
       return { data: [] };
     }
 
@@ -32,7 +31,6 @@ export async function fetchFavorites(token?: string): Promise<FavoritesResponse>
 
     return res.json();
   } catch (error) {
-    console.error("Error fetching favorites:", error);
     return { data: [] };
   }
 }
@@ -41,7 +39,11 @@ export async function fetchFavorites(token?: string): Promise<FavoritesResponse>
 export async function fetchMenuItems(): Promise<MenuItem[]> {
   try {
     const res = await fetch(`${API_BASE}/products`, { cache: "no-store" });
-    if (!res.ok) throw new Error(`Failed to fetch products: ${res.status}`);
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`Failed to fetch products: ${res.status} ${text}`);
+    }
 
     const json = await res.json();
     const data: MenuItem[] = Array.isArray(json.data) ? json.data : [];
@@ -60,10 +62,10 @@ export async function fetchMenuItems(): Promise<MenuItem[]> {
       };
     });
   } catch (err) {
-    console.error("Error fetching menu items:", err);
-    return [];
+    throw new Error("Something went wrong while fetching menu items. Please refresh the page.");
   }
 }
+
 
 export const fetchMenuItemById = async (id: number): Promise<MenuItem> => {
   const res = await fetch(`${API_BASE}/products/${id}`);

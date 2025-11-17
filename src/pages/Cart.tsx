@@ -112,7 +112,6 @@ const Cart: React.FC = () => {
 
       setOrderStatus('');
     } catch (err: unknown) {
-      console.error('Order error', err);
       const errorMessage =
         err instanceof Error ? err.message : 'Something went wrong';
       toast.error(errorMessage, { duration: 4000, position: 'top-center' });
