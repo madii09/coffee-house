@@ -14,6 +14,11 @@ export interface RegisterData {
   login: string;
   password: string;
   email?: string;
+  confirmPassword?: string;
+  city?: string;
+  street?: string;
+  houseNumber?: number;
+  paymentMethod?: 'cash' | 'card';
 }
 
 interface AuthState {
